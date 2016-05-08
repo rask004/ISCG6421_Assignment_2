@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 /// <summary>
 ///     Addstrip Project (ISCG6421 Assignment 2)
+///     Sub space for calculation related objects.
 /// </summary>
-namespace AddStrip
+namespace AddStrip.Calculations
 {
     /// <summary>
     ///     Interface for the Calculation Class.
