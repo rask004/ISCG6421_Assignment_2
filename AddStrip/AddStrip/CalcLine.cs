@@ -1,6 +1,6 @@
 using System;
 
-namespace AddStrip.SupportObjects
+namespace AddStrip
 {
 	public enum Operator {plus,minus,times,divide,subtotal,total, error};
 	//data type that holds literal code for allowable operators
