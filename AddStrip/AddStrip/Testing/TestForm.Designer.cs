@@ -95,8 +95,9 @@
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(250, 29);
             this.button4.TabIndex = 6;
-            this.button4.Text = "button4";
+            this.button4.Text = "operandInvalidTotalWarning";
             this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
             // button5
             // 
@@ -123,8 +124,9 @@
             this.button7.Name = "button7";
             this.button7.Size = new System.Drawing.Size(250, 29);
             this.button7.TabIndex = 7;
-            this.button7.Text = "button7";
+            this.button7.Text = "operatorInvalidTerminationWarning";
             this.button7.UseVisualStyleBackColor = true;
+            this.button7.Click += new System.EventHandler(this.button7_Click);
             // 
             // button8
             // 

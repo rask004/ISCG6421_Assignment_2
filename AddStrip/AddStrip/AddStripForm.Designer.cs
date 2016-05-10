@@ -58,7 +58,7 @@
             this.fileToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(555, 28);
+            this.menuStrip1.Size = new System.Drawing.Size(583, 28);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "mnuFile";
             // 
@@ -143,15 +143,15 @@
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.Location = new System.Drawing.Point(266, 32);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(180, 38);
+            this.label1.Size = new System.Drawing.Size(201, 38);
             this.label1.TabIndex = 2;
             this.label1.Text = "Enter your calculations in the text box below:";
             // 
             // txtNextCalculation
             // 
-            this.txtNextCalculation.Location = new System.Drawing.Point(269, 74);
+            this.txtNextCalculation.Location = new System.Drawing.Point(273, 73);
             this.txtNextCalculation.Name = "txtNextCalculation";
-            this.txtNextCalculation.Size = new System.Drawing.Size(149, 22);
+            this.txtNextCalculation.Size = new System.Drawing.Size(183, 22);
             this.txtNextCalculation.TabIndex = 3;
             this.txtNextCalculation.TextChanged += new System.EventHandler(this.txtCalculation_TextChanged);
             // 
@@ -160,7 +160,7 @@
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label2.Location = new System.Drawing.Point(266, 180);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(190, 38);
+            this.label2.Size = new System.Drawing.Size(201, 38);
             this.label2.TabIndex = 4;
             this.label2.Text = "To make changes select a line in the list first";
             // 
@@ -173,15 +173,15 @@
             this.panel1.Controls.Add(this.txtSelectedCalculation);
             this.panel1.Location = new System.Drawing.Point(269, 222);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(252, 98);
+            this.panel1.Size = new System.Drawing.Size(279, 98);
             this.panel1.TabIndex = 5;
             // 
             // btnInsertCalculation
             // 
             this.btnInsertCalculation.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnInsertCalculation.Location = new System.Drawing.Point(165, 55);
+            this.btnInsertCalculation.Location = new System.Drawing.Point(185, 55);
             this.btnInsertCalculation.Name = "btnInsertCalculation";
-            this.btnInsertCalculation.Size = new System.Drawing.Size(70, 30);
+            this.btnInsertCalculation.Size = new System.Drawing.Size(79, 30);
             this.btnInsertCalculation.TabIndex = 9;
             this.btnInsertCalculation.Text = "Insert";
             this.btnInsertCalculation.UseVisualStyleBackColor = true;
@@ -190,9 +190,9 @@
             // btnDeleteCalculation
             // 
             this.btnDeleteCalculation.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnDeleteCalculation.Location = new System.Drawing.Point(89, 55);
+            this.btnDeleteCalculation.Location = new System.Drawing.Point(99, 55);
             this.btnDeleteCalculation.Name = "btnDeleteCalculation";
-            this.btnDeleteCalculation.Size = new System.Drawing.Size(70, 30);
+            this.btnDeleteCalculation.Size = new System.Drawing.Size(79, 30);
             this.btnDeleteCalculation.TabIndex = 8;
             this.btnDeleteCalculation.Text = "Delete";
             this.btnDeleteCalculation.UseVisualStyleBackColor = true;
@@ -203,7 +203,7 @@
             this.btnUpdateCalculation.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnUpdateCalculation.Location = new System.Drawing.Point(13, 55);
             this.btnUpdateCalculation.Name = "btnUpdateCalculation";
-            this.btnUpdateCalculation.Size = new System.Drawing.Size(70, 30);
+            this.btnUpdateCalculation.Size = new System.Drawing.Size(79, 30);
             this.btnUpdateCalculation.TabIndex = 7;
             this.btnUpdateCalculation.Text = "Update";
             this.btnUpdateCalculation.UseVisualStyleBackColor = true;
@@ -213,7 +213,7 @@
             // 
             this.txtSelectedCalculation.Location = new System.Drawing.Point(49, 15);
             this.txtSelectedCalculation.Name = "txtSelectedCalculation";
-            this.txtSelectedCalculation.Size = new System.Drawing.Size(149, 22);
+            this.txtSelectedCalculation.Size = new System.Drawing.Size(183, 22);
             this.txtSelectedCalculation.TabIndex = 6;
             this.txtSelectedCalculation.TextChanged += new System.EventHandler(this.txtCalculation_TextChanged);
             // 
@@ -221,7 +221,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(555, 355);
+            this.ClientSize = new System.Drawing.Size(583, 349);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.txtNextCalculation);

@@ -15,9 +15,17 @@ namespace AddStrip.Testing
 {
     public partial class TestForm : Form
     {
-        static string operandDescriptionWarning = "All Operands should only contain a leading + or -, and numbers.";
+        static string operandDescriptionWarning = "All Operands should have the form [+ or -]<numbers>." +
+            "\r\nE.G: +10, -20, 5";
         static string operandAbsentWarning = "You did not enter an Operand in the calculation box.";
         static string operandInvalidFormatWarning = "The operand could not be converted to a valid number";
+        static string operandInvalidTotalWarning = "There are no calculations to total or subtotal.";
+        static string operatorInvalidTerminationWarning = "Invalid Termination symbol. Must be one of: " + "" +
+            "\r\nE.G: +10+, +10-, +10*, +10/, +10#, +10=";
+
+        const string terminators = "+-*/#=";
+        const string signs = "+-";
+
 
         public TestForm()
         {
@@ -50,7 +58,7 @@ namespace AddStrip.Testing
                 button3_Click(this, null);
                 return;
             }
-            // expect only calculation symbols */+-#=
+            // expect only calculation symbols */+-#= and signs +-
             foreach (Char symbol in @"!@$%^&()_[]{};:'<>,.?`~")
             {
                 if (calcText.Contains(symbol))
@@ -61,7 +69,17 @@ namespace AddStrip.Testing
             }
 
             string calcOperand = calcText.Substring(0, calcText.Length - 1);
-            string calcOperator = calcText.Substring(calcText.Length - 1);
+            string calcOperator = calcText.Substring(calcText.Length - 1, 1);
+
+            // must terminate with one of -+/*#=, or for first calculation -+/*
+            if (!terminators.Contains(calcOperator))
+            {
+                button7_Click(this, null);
+            }
+
+            // for first calculation, would check if listbox is empty, then check if terminator is
+            // # or = for error.
+            // don't do this for Testform.
 
             try
             {
@@ -69,8 +87,7 @@ namespace AddStrip.Testing
             }
             catch (FormatException)
             {
-                MessageBox.Show(operandInvalidFormatWarning, "Error");
-                return;
+                button5_Click(this, null);
             }
 
             MessageBox.Show("Operand is: " + calcOperand + "; Operator is: " + calcOperator, "Notice");
@@ -89,6 +106,16 @@ namespace AddStrip.Testing
         private void button5_Click(object sender, EventArgs e)
         {
             MessageBox.Show(operandInvalidFormatWarning, "Error");
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show(operandInvalidTotalWarning, "Error");
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show(operatorInvalidTerminationWarning, "Error");
         }
     }
 }
