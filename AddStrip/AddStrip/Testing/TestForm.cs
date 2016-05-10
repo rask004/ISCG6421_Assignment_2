@@ -20,7 +20,7 @@ namespace AddStrip.Testing
         static string operandAbsentWarning = "You did not enter an Operand in the calculation box.";
         static string operandInvalidFormatWarning = "The operand could not be converted to a valid number";
         static string operandInvalidTotalWarning = "There are no calculations to total or subtotal.";
-        static string operatorInvalidTerminationWarning = "Invalid Termination symbol. Must be one of: " + "" +
+        static string operatorInvalidTerminationWarning = "Invalid Termination symbol. Must be one of: " + terminators +
             "\r\nE.G: +10+, +10-, +10*, +10/, +10#, +10=";
 
         const string terminators = "+-*/#=";

@@ -117,7 +117,32 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <metadata name="menuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="menuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing">
     <value>17, 17</value>
-  </metadata>
+  </data>
+  <data name="operandAbsentWarning" xml:space="preserve">
+    <value>You did not enter an Operand in the calculation box.</value>
+  </data>
+  <data name="operandDescriptionWarning" xml:space="preserve">
+    <value>All Operands should have the form [+ or -]&lt;numbers&gt;. \r\nE.G: +10, -20, 5</value>
+  </data>
+  <data name="operandDigits" xml:space="preserve">
+    <value>1234567890</value>
+  </data>
+  <data name="operandInvalidFormatWarning" xml:space="preserve">
+    <value>The operand could not be converted to a valid number</value>
+  </data>
+  <data name="operandInvalidTotalWarning" xml:space="preserve">
+    <value>There are no calculations to total or subtotal.</value>
+  </data>
+  <data name="operandSigns" xml:space="preserve">
+    <value>+-</value>
+  </data>
+  <data name="operatorInvalidTerminationWarning" xml:space="preserve">
+    <value>Invalid Termination symbol. Must be one of: +-*/#= \r\nE.G: +10+, +10-, +10*, +10/, +10#, +10=</value>
+  </data>
+  <data name="operatorTerminators" xml:space="preserve">
+    <value>+-*/#=</value>
+  </data>
 </root>
