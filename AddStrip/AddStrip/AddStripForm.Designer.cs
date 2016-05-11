@@ -1,6 +1,6 @@
 ﻿namespace AddStrip
 {
-    partial class AddStripForm
+    partial class frmAddStrip
     {
         /// <summary>
         /// Required designer variable.
@@ -28,16 +28,16 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnuAddStrip = new System.Windows.Forms.MenuStrip();
+            this.tlstrpFileMenu = new System.Windows.Forms.ToolStripMenuItem();
+            this.tlstrpItemNew = new System.Windows.Forms.ToolStripMenuItem();
+            this.tlstrpItemOpen = new System.Windows.Forms.ToolStripMenuItem();
+            this.tlstrpItemSave = new System.Windows.Forms.ToolStripMenuItem();
+            this.tlstrpItemSaveAs = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.printToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tlstrpItemPrint = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tlstrpItemExit = new System.Windows.Forms.ToolStripMenuItem();
             this.lstCalculations = new System.Windows.Forms.ListBox();
             this.label1 = new System.Windows.Forms.Label();
             this.txtNextCalculation = new System.Windows.Forms.TextBox();
@@ -47,87 +47,89 @@
             this.btnDeleteCalculation = new System.Windows.Forms.Button();
             this.btnUpdateCalculation = new System.Windows.Forms.Button();
             this.txtSelectedCalculation = new System.Windows.Forms.TextBox();
-            this.menuStrip1.SuspendLayout();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.mnuAddStrip.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // menuStrip1
+            // mnuAddStrip
             // 
-            this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
-            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem});
-            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
-            this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(583, 28);
-            this.menuStrip1.TabIndex = 0;
-            this.menuStrip1.Text = "mnuFile";
+            this.mnuAddStrip.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.mnuAddStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tlstrpFileMenu});
+            this.mnuAddStrip.Location = new System.Drawing.Point(0, 0);
+            this.mnuAddStrip.Name = "mnuAddStrip";
+            this.mnuAddStrip.Size = new System.Drawing.Size(583, 28);
+            this.mnuAddStrip.TabIndex = 0;
+            this.mnuAddStrip.Text = "mnuFile";
             // 
-            // fileToolStripMenuItem
+            // tlstrpFileMenu
             // 
-            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.newToolStripMenuItem,
-            this.openToolStripMenuItem,
-            this.saveToolStripMenuItem,
-            this.saveAsToolStripMenuItem,
+            this.tlstrpFileMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tlstrpItemNew,
+            this.tlstrpItemOpen,
+            this.tlstrpItemSave,
+            this.tlstrpItemSaveAs,
             this.toolStripSeparator1,
-            this.printToolStripMenuItem,
+            this.tlstrpItemPrint,
             this.toolStripSeparator2,
-            this.exitToolStripMenuItem});
-            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(44, 24);
-            this.fileToolStripMenuItem.Text = "File";
+            this.tlstrpItemExit});
+            this.tlstrpFileMenu.Name = "tlstrpFileMenu";
+            this.tlstrpFileMenu.Size = new System.Drawing.Size(44, 24);
+            this.tlstrpFileMenu.Text = "File";
             // 
-            // newToolStripMenuItem
+            // tlstrpItemNew
             // 
-            this.newToolStripMenuItem.Name = "newToolStripMenuItem";
-            this.newToolStripMenuItem.Size = new System.Drawing.Size(144, 26);
-            this.newToolStripMenuItem.Text = "New";
-            this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
+            this.tlstrpItemNew.Name = "tlstrpItemNew";
+            this.tlstrpItemNew.Size = new System.Drawing.Size(181, 26);
+            this.tlstrpItemNew.Text = "New";
+            this.tlstrpItemNew.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
             // 
-            // openToolStripMenuItem
+            // tlstrpItemOpen
             // 
-            this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(144, 26);
-            this.openToolStripMenuItem.Text = "Open...";
-            this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
+            this.tlstrpItemOpen.Name = "tlstrpItemOpen";
+            this.tlstrpItemOpen.Size = new System.Drawing.Size(181, 26);
+            this.tlstrpItemOpen.Text = "Open...";
+            this.tlstrpItemOpen.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
-            // saveToolStripMenuItem
+            // tlstrpItemSave
             // 
-            this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(144, 26);
-            this.saveToolStripMenuItem.Text = "Save...";
-            this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
+            this.tlstrpItemSave.Name = "tlstrpItemSave";
+            this.tlstrpItemSave.Size = new System.Drawing.Size(181, 26);
+            this.tlstrpItemSave.Text = "Save...";
+            this.tlstrpItemSave.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
-            // saveAsToolStripMenuItem
+            // tlstrpItemSaveAs
             // 
-            this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(144, 26);
-            this.saveAsToolStripMenuItem.Text = "Save As...";
-            this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
+            this.tlstrpItemSaveAs.Name = "tlstrpItemSaveAs";
+            this.tlstrpItemSaveAs.Size = new System.Drawing.Size(181, 26);
+            this.tlstrpItemSaveAs.Text = "Save As...";
+            this.tlstrpItemSaveAs.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(141, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(178, 6);
             // 
-            // printToolStripMenuItem
+            // tlstrpItemPrint
             // 
-            this.printToolStripMenuItem.Name = "printToolStripMenuItem";
-            this.printToolStripMenuItem.Size = new System.Drawing.Size(144, 26);
-            this.printToolStripMenuItem.Text = "Print";
-            this.printToolStripMenuItem.Click += new System.EventHandler(this.printToolStripMenuItem_Click);
+            this.tlstrpItemPrint.Name = "tlstrpItemPrint";
+            this.tlstrpItemPrint.Size = new System.Drawing.Size(181, 26);
+            this.tlstrpItemPrint.Text = "Print";
+            this.tlstrpItemPrint.Click += new System.EventHandler(this.printToolStripMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(141, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(178, 6);
             // 
-            // exitToolStripMenuItem
+            // tlstrpItemExit
             // 
-            this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(144, 26);
-            this.exitToolStripMenuItem.Text = "Exit";
-            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
+            this.tlstrpItemExit.Name = "tlstrpItemExit";
+            this.tlstrpItemExit.Size = new System.Drawing.Size(181, 26);
+            this.tlstrpItemExit.Text = "Exit";
+            this.tlstrpItemExit.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
             // lstCalculations
             // 
@@ -153,7 +155,7 @@
             this.txtNextCalculation.Name = "txtNextCalculation";
             this.txtNextCalculation.Size = new System.Drawing.Size(183, 22);
             this.txtNextCalculation.TabIndex = 3;
-            this.txtNextCalculation.TextChanged += new System.EventHandler(this.txtCalculation_TextChanged);
+            this.txtNextCalculation.TextChanged += new System.EventHandler(this.txtNewCalculation_TextChanged);
             // 
             // label2
             // 
@@ -215,26 +217,44 @@
             this.txtSelectedCalculation.Name = "txtSelectedCalculation";
             this.txtSelectedCalculation.Size = new System.Drawing.Size(183, 22);
             this.txtSelectedCalculation.TabIndex = 6;
-            this.txtSelectedCalculation.TextChanged += new System.EventHandler(this.txtCalculation_TextChanged);
+            this.txtSelectedCalculation.TextChanged += new System.EventHandler(this.txtSelectedCalculation_TextChanged);
             // 
-            // AddStripForm
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(273, 120);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(0, 17);
+            this.label3.TabIndex = 6;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(400, 120);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(0, 17);
+            this.label4.TabIndex = 7;
+            // 
+            // frmAddStrip
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(583, 349);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.label3);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.txtNextCalculation);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.lstCalculations);
-            this.Controls.Add(this.menuStrip1);
-            this.MainMenuStrip = this.menuStrip1;
-            this.Name = "AddStripForm";
+            this.Controls.Add(this.mnuAddStrip);
+            this.MainMenuStrip = this.mnuAddStrip;
+            this.Name = "frmAddStrip";
             this.Text = "AddStripForm";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AddStripForm_FormClosing);
             this.Load += new System.EventHandler(this.AddStripForm_Load);
-            this.menuStrip1.ResumeLayout(false);
-            this.menuStrip1.PerformLayout();
+            this.mnuAddStrip.ResumeLayout(false);
+            this.mnuAddStrip.PerformLayout();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.ResumeLayout(false);
@@ -244,16 +264,16 @@
 
         #endregion
 
-        private System.Windows.Forms.MenuStrip menuStrip1;
-        private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem newToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
+        private System.Windows.Forms.MenuStrip mnuAddStrip;
+        private System.Windows.Forms.ToolStripMenuItem tlstrpFileMenu;
+        private System.Windows.Forms.ToolStripMenuItem tlstrpItemNew;
+        private System.Windows.Forms.ToolStripMenuItem tlstrpItemOpen;
+        private System.Windows.Forms.ToolStripMenuItem tlstrpItemSave;
+        private System.Windows.Forms.ToolStripMenuItem tlstrpItemSaveAs;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.ToolStripMenuItem printToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem tlstrpItemPrint;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
-        private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem tlstrpItemExit;
         private System.Windows.Forms.ListBox lstCalculations;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox txtNextCalculation;
@@ -263,5 +283,7 @@
         private System.Windows.Forms.Button btnDeleteCalculation;
         private System.Windows.Forms.Button btnUpdateCalculation;
         private System.Windows.Forms.TextBox txtSelectedCalculation;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label4;
     }
 }

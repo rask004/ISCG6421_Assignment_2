@@ -63,82 +63,10 @@ namespace AddStrip {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Point similar to {X=17,Y=17}.
         /// </summary>
-        public static System.Drawing.Point menuStrip1_TrayLocation {
+        public static System.Drawing.Point mnuAddStrip_TrayLocation {
             get {
-                object obj = ResourceManager.GetObject("menuStrip1.TrayLocation", resourceCulture);
+                object obj = ResourceManager.GetObject("mnuAddStrip.TrayLocation", resourceCulture);
                 return ((System.Drawing.Point)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to You did not enter an Operand in the calculation box..
-        /// </summary>
-        public static string operandAbsentWarning {
-            get {
-                return ResourceManager.GetString("operandAbsentWarning", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to All Operands should have the form [+ or -]&lt;numbers&gt;. \r\nE.G: +10, -20, 5.
-        /// </summary>
-        public static string operandDescriptionWarning {
-            get {
-                return ResourceManager.GetString("operandDescriptionWarning", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to 1234567890.
-        /// </summary>
-        public static string operandDigits {
-            get {
-                return ResourceManager.GetString("operandDigits", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The operand could not be converted to a valid number.
-        /// </summary>
-        public static string operandInvalidFormatWarning {
-            get {
-                return ResourceManager.GetString("operandInvalidFormatWarning", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to There are no calculations to total or subtotal..
-        /// </summary>
-        public static string operandInvalidTotalWarning {
-            get {
-                return ResourceManager.GetString("operandInvalidTotalWarning", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to +-.
-        /// </summary>
-        public static string operandSigns {
-            get {
-                return ResourceManager.GetString("operandSigns", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Invalid Termination symbol. Must be one of: +-*/#= \r\nE.G: +10+, +10-, +10*, +10/, +10#, +10=.
-        /// </summary>
-        public static string operatorInvalidTerminationWarning {
-            get {
-                return ResourceManager.GetString("operatorInvalidTerminationWarning", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to +-*/#=.
-        /// </summary>
-        public static string operatorTerminators {
-            get {
-                return ResourceManager.GetString("operatorTerminators", resourceCulture);
             }
         }
     }

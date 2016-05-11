@@ -16,7 +16,7 @@ namespace AddStrip
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new AddStripForm());
+            Application.Run(new frmAddStrip());
         }
     }
 }

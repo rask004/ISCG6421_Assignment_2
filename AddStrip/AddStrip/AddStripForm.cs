@@ -9,9 +9,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using AddStrip.Calculations;
 
-//TODO: create a test form for creating messages (clickdummy)
-//TODO: create a main form, dummy form with no actions or validation.
-//TODO: create namespace structure, and update files.
+//TODO: introduce string validation of new calculation strings.
+//TODO: introduce generating CalcLines (only debug at this stage).
 
 /// <summary>
 ///     Addstrip Project (ISCG6421 Assignment 2)
@@ -21,7 +20,7 @@ namespace AddStrip
     /// <summary>
     ///     Main user form for the AddStrip application
     /// </summary>
-    public partial class AddStripForm : Form
+    public partial class frmAddStrip : Form
     {
         // Stores calc lines and manages displayed results.
         Calculation calculationManager;
@@ -31,10 +30,27 @@ namespace AddStrip
         //TODO: remove this when testing finished.
         AddStrip.Testing.TestForm testForm;
 
+
+        // Local Constants: UI messages
+        public const string operandDescriptionWarning = "All Operands should have the form [+ or -]<numbers>." +
+            "\r\nE.G: +10, -20, 5";
+        public const string operandAbsentWarning = "You did not enter an Operand in the calculation box.";
+        public const string operandInvalidFormatWarning = "The operand could not be converted to a valid number";
+        public const string operandInvalidTotalWarning = "There are no calculations to total or subtotal.";
+        public const string operatorInvalidTerminationWarning = "Invalid Termination symbol. Must be one of: " + 
+            operatorTerminators +
+            "\r\nE.G: +10+, +10-, +10*, +10/, +10#, +10=";
+
+        // Local Constants: valid calculation symbols
+        public const string operatorTerminators = "+-*/#=";
+        public const string operatorTotals = "#=";
+        public const string operandSigns = "+-";
+        public const string operandDigits = "0123456789";
+
         /// <summary>
         ///     Constructor
         /// </summary>
-        public AddStripForm()
+        public frmAddStrip()
         {
             InitializeComponent();
             calculationManager = new Calculation(lstCalculations);
@@ -126,8 +142,66 @@ namespace AddStrip
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void txtCalculation_TextChanged(object sender, EventArgs e)
+        private void txtNewCalculation_TextChanged(object sender, EventArgs e)
         {
+            // check that all chars are permitted chars.
+            // if not, warn user.
+
+            bool invalidCharsFound = false;
+
+            string text = txtNextCalculation.Text;
+            string calcText = "";
+
+            // check for invalid chars, remove, 
+            for (int i = 0; i < text.Length; i++)
+            {
+                if (!(operatorTerminators.Contains(text[i]) 
+                    || operandDigits.Contains(text[i])))
+                {
+                    invalidCharsFound = true;
+                }
+                else
+                {
+                    calcText += text[i];
+                }
+            }
+            txtNextCalculation.Text = calcText;
+            text = calcText;
+            calcText = "";
+
+            if (invalidCharsFound)
+            {
+                MessageBox.Show(operandDescriptionWarning, "Error");
+            }
+
+            else if (text.Length > 1
+                && operatorTerminators.Contains(text.Substring(text.Length - 1)))
+            {
+
+
+                // remove any whitespace - easier to process.
+                foreach (char c in text)
+                {
+                    if (!Char.IsWhiteSpace(c))
+                    {
+                        calcText += c;
+                    }
+                }
+
+                // separate operand and operator
+                string calcOperand = calcText.Substring(0, calcText.Length - 1);
+                string calcOperator = calcText.Substring(calcText.Length - 1);
+
+                label3.Text = calcOperand;
+                label4.Text = calcOperator;
+
+                // (sub)total operators cannot be used if calculation list is empty, as
+                // there are no calculations to total.
+                if (operatorTotals.Contains(calcOperator) && lstCalculations.Items.Count == 0)
+                {
+                    MessageBox.Show(operandInvalidTotalWarning, "Error");
+                }
+            }
 
         }
 
@@ -157,6 +231,16 @@ namespace AddStrip
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void btnInsertCalculation_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void txtSelectedCalculation_TextChanged(object sender, EventArgs e)
         {
 
         }

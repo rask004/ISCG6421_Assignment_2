@@ -25,6 +25,7 @@ namespace AddStrip.Testing
 
         const string terminators = "+-*/#=";
         const string signs = "+-";
+        const string digits = "0123456789";
 
 
         public TestForm()
@@ -67,6 +68,8 @@ namespace AddStrip.Testing
                     return;
                 }
             }
+
+
 
             string calcOperand = calcText.Substring(0, calcText.Length - 1);
             string calcOperator = calcText.Substring(calcText.Length - 1, 1);
@@ -116,6 +119,55 @@ namespace AddStrip.Testing
         private void button7_Click(object sender, EventArgs e)
         {
             MessageBox.Show(operatorInvalidTerminationWarning, "Error");
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            bool invalidCharsFound = false;
+
+            string text = textBox1.Text;
+            string calcText = "";
+
+            // check for invalid chars, remove, 
+            for (int i=0; i < text.Length; i++)
+            {
+                if(!(terminators.Contains(text[i]) || digits.Contains(text[i])))
+                {
+                    invalidCharsFound = true;
+                }
+                else
+                {
+                    calcText += text[i];
+                }
+            }
+            textBox1.Text = calcText;
+            text = calcText;
+            calcText = "";
+
+            if (invalidCharsFound)
+            {
+                MessageBox.Show(operandDescriptionWarning, "Error");
+            }
+
+            else if (text.Length > 1 
+                && terminators.Contains(text.Substring(text.Length-1)))
+            {
+                
+
+                // remove any whitespace - easier to process.
+                foreach (char c in text)
+                {
+                    if (!Char.IsWhiteSpace(c))
+                    {
+                        calcText += c;
+                    }
+                }
+
+                MessageBox.Show(calcText);
+            }
+            
+
+
         }
     }
 }
