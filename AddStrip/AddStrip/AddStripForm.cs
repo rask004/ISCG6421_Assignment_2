@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using AddStrip.Calculations;
+using System.Collections.ObjectModel;
 
 //TODO: introduce string validation of new calculation strings.
 //TODO: introduce generating CalcLines (only debug at this stage).
@@ -42,6 +43,7 @@ namespace AddStrip
             "\r\nE.G: +10+, +10-, +10*, +10/, +10#, +10=";
 
         // Local Constants: valid calculation symbols
+        // More flexible than using a textbox mask - check specific chars, not groups of chars.
         public const string operatorTerminators = "+-*/#=";
         public const string operatorTotals = "#=";
         public const string operandSigns = "+-";
@@ -53,7 +55,7 @@ namespace AddStrip
         public frmAddStrip()
         {
             InitializeComponent();
-            //lstCalculations.Items = new ObservableCollection<>();
+            lstCalculations.DataSource = new List<String>();
             calculationManager = new Calculation(lstCalculations);
         }
 
@@ -146,9 +148,6 @@ namespace AddStrip
         /// <param name="e"></param>
         private void txtNextCalculation_TextChanged(object sender, EventArgs e)
         {
-            // check that all chars are permitted chars.
-            // if not, warn user.
-
             string text = txtNextCalculation.Text;
             string calcText = "";                       // to contain calculation value
             string terminator = null;                     // to contain termination operator
@@ -165,13 +164,13 @@ namespace AddStrip
             // first symbol must be sign or digit
             if (text.Length >= 1)
             {
-                // special case: a Calcline was just created and added to the Calculation Object.
-                // the associated listbox was updated with a new 
-                if (sender is ListBox
-                    && text.Length == 1
-                    && operatorTerminators.Contains(text[0]))
+                // special case: a Calcline was just added and the textbox has been updated
+                // with the last operator symbol, if the symbol was not a (sub)total
+                if (text.Length == 1
+                    && operatorTerminators.Contains(text[0])
+                    && !operatorTotals.Contains(text[0]))
                 {
-
+                    return;
                 }
                 else if (!operandSigns.Contains(text[0])
                     && !operandDigits.Contains(text[0]))
@@ -259,10 +258,20 @@ namespace AddStrip
                 // Create CalcLine object here
                 string calcString = terminator.ToString() + calcText;
                 CalcLine newCalcLine = new CalcLine(calcString);
-                calculationManager.Add(newCalcLine);
+                //calculationManager.Add(newCalcLine);
 
+                // if terminating operator is not a (sub)total, change textbox to only show the operator
+                // otherwise clear the textbox.
                 tip.Hide(txtNextCalculation);
-                MessageBox.Show("Calculation = " + calcText + "\r\nOperation = " + terminator, "Notice");
+                if (!operatorTotals.Contains(terminator))
+                {
+                    txtNextCalculation.Text = terminator.ToString();
+                    txtNextCalculation.Select(0, txtNextCalculation.Text.Length);
+                }
+                else
+                {
+                    txtNextCalculation.Text = "";
+                }
             }
 
             // End of Calc Line Processing
