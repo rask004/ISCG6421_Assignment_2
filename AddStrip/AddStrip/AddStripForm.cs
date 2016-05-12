@@ -53,6 +53,7 @@ namespace AddStrip
         public frmAddStrip()
         {
             InitializeComponent();
+            //lstCalculations.Items = new ObservableCollection<>();
             calculationManager = new Calculation(lstCalculations);
         }
 
@@ -166,7 +167,7 @@ namespace AddStrip
             {
                 // special case: a Calcline was just created and added to the Calculation Object.
                 // the associated listbox was updated with a new 
-                if ((sender as ListBox).Name == lstCalculations.Name
+                if (sender is ListBox
                     && text.Length == 1
                     && operatorTerminators.Contains(text[0]))
                 {
@@ -231,6 +232,13 @@ namespace AddStrip
                 }
             }
 
+            // special case: user requested (sub)total and there are no calculations to total
+            if (lstCalculations.Items.Count == 0
+                && operatorTotals.Contains(text[text.Length - 1]))
+            {
+                warning = operandInvalidTotalWarning;
+            }
+
             if (warning.Length > 0)
             {
                 // remove invalid chars from textbox contents.
@@ -241,13 +249,6 @@ namespace AddStrip
                 return;
             }
 
-            // special case: user requested (sub)total and there are no calculations to total
-            if (lstCalculations.Items.Count == 0
-                && operatorTotals.Contains(text[text.Length - 1]))
-            {
-                warning = operandInvalidTotalWarning;
-            }
-
             // End of Validation
 
             // Start of Calc Line Processing
@@ -256,6 +257,9 @@ namespace AddStrip
             if (terminator != null)
             {
                 // Create CalcLine object here
+                string calcString = terminator.ToString() + calcText;
+                CalcLine newCalcLine = new CalcLine(calcString);
+                calculationManager.Add(newCalcLine);
 
                 tip.Hide(txtNextCalculation);
                 MessageBox.Show("Calculation = " + calcText + "\r\nOperation = " + terminator, "Notice");

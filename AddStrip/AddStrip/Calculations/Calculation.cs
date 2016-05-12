@@ -46,6 +46,8 @@ namespace AddStrip.Calculations
         /// <param name="cl"></param>
         public void Add(CalcLine cl)
         {
+            theCalcs.Add(cl);
+
             throw new NotImplementedException();
         }
 
@@ -54,6 +56,8 @@ namespace AddStrip.Calculations
         /// </summary>
         public void Clear()
         {
+            theCalcs.Clear();
+
             throw new NotImplementedException();
         }
 
@@ -63,6 +67,17 @@ namespace AddStrip.Calculations
         /// <param name="n"></param>
         public void Delete(int n)
         {
+            if (n >= 0 && n <= theCalcs.Count)
+            {
+                theCalcs.RemoveAt(n);
+            }
+            else
+            {
+                throw new IndexOutOfRangeException("index n = " + n +
+                    "; range = 0 to " + theCalcs.Count);
+            }
+            
+
             throw new NotImplementedException();
         }
 
@@ -73,6 +88,16 @@ namespace AddStrip.Calculations
         /// <returns></returns>
         public CalcLine Find(int n)
         {
+            if (n >= 0 && n <= theCalcs.Count)
+            {
+                CalcLine cl = (CalcLine)theCalcs[n];
+            }
+            else
+            {
+                throw new IndexOutOfRangeException("index n = " + n +
+                    "; range = 0 to " + theCalcs.Count);
+            }
+
             throw new NotImplementedException();
         }
 
@@ -83,6 +108,20 @@ namespace AddStrip.Calculations
         /// <param name="n"></param>
         public void Insert(CalcLine newCalc, int n)
         {
+            if (n > theCalcs.Count)
+            {
+                Add(newCalc);
+            }
+            else if (n >= 0 && n <= theCalcs.Count)
+            {
+                theCalcs.Insert(n, newCalc);
+            }
+            else
+            {
+                throw new IndexOutOfRangeException("index n = " + n +
+                    "; range = 0 to " + theCalcs.Count);
+            }
+
             throw new NotImplementedException();
         }
 
@@ -103,8 +142,23 @@ namespace AddStrip.Calculations
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="newCalc"></param>
+        /// <param name="n"></param>
         public void Replace(CalcLine newCalc, int n)
         {
+            if (n >= 0 && n <= theCalcs.Count)
+            {
+                theCalcs[n] = newCalc;
+            }
+            else
+            {
+                throw new IndexOutOfRangeException("index n = " + n +
+                    "; range = 0 to " + theCalcs.Count);
+            }
+
             throw new NotImplementedException();
         }
 
