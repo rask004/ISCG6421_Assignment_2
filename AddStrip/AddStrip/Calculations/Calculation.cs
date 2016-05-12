@@ -137,34 +137,33 @@ namespace AddStrip.Calculations
         /// </summary>
         public void Redisplay()
         {
+            // TODO: complete logic for handling (sub)totals.
+
+            double total = 0;
+
+            lstDisplay.Items.Clear();
 
             // check all known Calc Lines
             for (int i = 0; i < theCalcs.Count; i++)
             {
-                var calcString = theCalcs[i].ToString();
+                CalcLine currentCalcLine = (theCalcs[i] as CalcLine);
+                var calcString = currentCalcLine.ToString();
 
-                // prepare string if (sub)total
+                total = currentCalcLine.NextResult(total);
 
-
-                // if new calc line, add to listbox contents
-                // otherwise update contents at relevant indices
-                try
+                // prepare subtotal string if (sub)total
+                if (currentCalcLine.Op == Operator.subtotal ||
+                    currentCalcLine.Op == Operator.total)
                 {
-                    if (!lstDisplay.Items[i].Equals(theCalcs[i].ToString()))
-                    {
-                        lstDisplay.Items[i] = calcString;
-                    }
+                    calcString += " <" + total + ">";
                 }
-                catch (ArgumentOutOfRangeException)
-                {
-                    lstDisplay.Items.Add(calcString);
-                }
-            }
 
-            // if calc lines have been removed, delete the excess listbox lines.
-            while (theCalcs.Count < lstDisplay.Items.Count)
-            {
-                lstDisplay.Items.RemoveAt(lstDisplay.Items.Count - 1);
+                if (currentCalcLine.Op == Operator.total)
+                {
+                    total = 0;
+                }
+
+                lstDisplay.Items.Add(calcString);
             }
 
         }

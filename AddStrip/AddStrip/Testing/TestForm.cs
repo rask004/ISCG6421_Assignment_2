@@ -9,8 +9,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-//TODO: figure out why error checks are failing.
-
 namespace AddStrip.Testing
 {
     public partial class TestForm : Form

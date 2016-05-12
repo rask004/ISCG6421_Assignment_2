@@ -10,8 +10,9 @@ using System.Windows.Forms;
 using AddStrip.Calculations;
 using System.Collections.ObjectModel;
 
-//TODO: introduce string validation of new calculation strings.
-//TODO: introduce generating CalcLines (only debug at this stage).
+//TODO: complete menu items
+//TODO: complete calculation methods for saving and loading
+//TODO: complete logic for update, insert validation
 
 /// <summary>
 ///     Addstrip Project (ISCG6421 Assignment 2)
@@ -28,10 +29,6 @@ namespace AddStrip
 
         // the last file that calculations were saved to.
         private string saveFilename;
-
-
-        //TODO: remove this when testing finished.
-        AddStrip.Testing.TestForm testForm;
 
 
         // Local Constants: UI messages
@@ -68,8 +65,7 @@ namespace AddStrip
         /// <param name="e"></param>
         private void AddStripForm_Load(object sender, EventArgs e)
         {
-            testForm = new AddStrip.Testing.TestForm();
-            testForm.Show();
+
         }
 
         /// <summary>
@@ -79,7 +75,7 @@ namespace AddStrip
         /// <param name="e"></param>
         private void AddStripForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            testForm.Dispose();
+
         }
 
         /// <summary>
