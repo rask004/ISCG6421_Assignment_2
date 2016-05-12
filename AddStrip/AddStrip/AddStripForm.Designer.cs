@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.mnuAddStrip = new System.Windows.Forms.MenuStrip();
             this.tlstrpFileMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.tlstrpItemNew = new System.Windows.Forms.ToolStripMenuItem();
@@ -40,7 +41,6 @@
             this.tlstrpItemExit = new System.Windows.Forms.ToolStripMenuItem();
             this.lstCalculations = new System.Windows.Forms.ListBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.txtNextCalculation = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
             this.btnInsertCalculation = new System.Windows.Forms.Button();
@@ -49,6 +49,8 @@
             this.txtSelectedCalculation = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
+            this.tip = new System.Windows.Forms.ToolTip(this.components);
+            this.txtNextCalculation = new System.Windows.Forms.TextBox();
             this.mnuAddStrip.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -82,52 +84,52 @@
             // tlstrpItemNew
             // 
             this.tlstrpItemNew.Name = "tlstrpItemNew";
-            this.tlstrpItemNew.Size = new System.Drawing.Size(181, 26);
+            this.tlstrpItemNew.Size = new System.Drawing.Size(144, 26);
             this.tlstrpItemNew.Text = "New";
             this.tlstrpItemNew.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
             // 
             // tlstrpItemOpen
             // 
             this.tlstrpItemOpen.Name = "tlstrpItemOpen";
-            this.tlstrpItemOpen.Size = new System.Drawing.Size(181, 26);
+            this.tlstrpItemOpen.Size = new System.Drawing.Size(144, 26);
             this.tlstrpItemOpen.Text = "Open...";
             this.tlstrpItemOpen.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
             // tlstrpItemSave
             // 
             this.tlstrpItemSave.Name = "tlstrpItemSave";
-            this.tlstrpItemSave.Size = new System.Drawing.Size(181, 26);
+            this.tlstrpItemSave.Size = new System.Drawing.Size(144, 26);
             this.tlstrpItemSave.Text = "Save...";
             this.tlstrpItemSave.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // tlstrpItemSaveAs
             // 
             this.tlstrpItemSaveAs.Name = "tlstrpItemSaveAs";
-            this.tlstrpItemSaveAs.Size = new System.Drawing.Size(181, 26);
+            this.tlstrpItemSaveAs.Size = new System.Drawing.Size(144, 26);
             this.tlstrpItemSaveAs.Text = "Save As...";
             this.tlstrpItemSaveAs.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(178, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(141, 6);
             // 
             // tlstrpItemPrint
             // 
             this.tlstrpItemPrint.Name = "tlstrpItemPrint";
-            this.tlstrpItemPrint.Size = new System.Drawing.Size(181, 26);
+            this.tlstrpItemPrint.Size = new System.Drawing.Size(144, 26);
             this.tlstrpItemPrint.Text = "Print";
             this.tlstrpItemPrint.Click += new System.EventHandler(this.printToolStripMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(178, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(141, 6);
             // 
             // tlstrpItemExit
             // 
             this.tlstrpItemExit.Name = "tlstrpItemExit";
-            this.tlstrpItemExit.Size = new System.Drawing.Size(181, 26);
+            this.tlstrpItemExit.Size = new System.Drawing.Size(144, 26);
             this.tlstrpItemExit.Text = "Exit";
             this.tlstrpItemExit.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -148,14 +150,6 @@
             this.label1.Size = new System.Drawing.Size(201, 38);
             this.label1.TabIndex = 2;
             this.label1.Text = "Enter your calculations in the text box below:";
-            // 
-            // txtNextCalculation
-            // 
-            this.txtNextCalculation.Location = new System.Drawing.Point(273, 73);
-            this.txtNextCalculation.Name = "txtNextCalculation";
-            this.txtNextCalculation.Size = new System.Drawing.Size(183, 22);
-            this.txtNextCalculation.TabIndex = 3;
-            this.txtNextCalculation.TextChanged += new System.EventHandler(this.txtNewCalculation_TextChanged);
             // 
             // label2
             // 
@@ -235,6 +229,15 @@
             this.label4.Size = new System.Drawing.Size(0, 17);
             this.label4.TabIndex = 7;
             // 
+            // txtNextCalculation
+            // 
+            this.txtNextCalculation.Location = new System.Drawing.Point(273, 73);
+            this.txtNextCalculation.Name = "txtNextCalculation";
+            this.txtNextCalculation.Size = new System.Drawing.Size(183, 22);
+            this.txtNextCalculation.TabIndex = 3;
+            this.txtNextCalculation.TextChanged += new System.EventHandler(this.txtNextCalculation_TextChanged);
+            this.txtNextCalculation.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtNextCalculation_KeyDown);
+            // 
             // frmAddStrip
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -276,7 +279,6 @@
         private System.Windows.Forms.ToolStripMenuItem tlstrpItemExit;
         private System.Windows.Forms.ListBox lstCalculations;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox txtNextCalculation;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Button btnInsertCalculation;
@@ -285,5 +287,7 @@
         private System.Windows.Forms.TextBox txtSelectedCalculation;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.ToolTip tip;
+        private System.Windows.Forms.TextBox txtNextCalculation;
     }
 }

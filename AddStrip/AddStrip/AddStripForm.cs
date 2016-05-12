@@ -138,70 +138,131 @@ namespace AddStrip
         }
 
         /// <summary>
-        /// 
+        ///     Verify calculation lines entered into the new calculation textbox.
+        ///     
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void txtNewCalculation_TextChanged(object sender, EventArgs e)
+        private void txtNextCalculation_TextChanged(object sender, EventArgs e)
         {
             // check that all chars are permitted chars.
             // if not, warn user.
 
-            bool invalidCharsFound = false;
-
             string text = txtNextCalculation.Text;
-            string calcText = "";
+            string calcText = "";                       // to contain calculation value
+            string terminator = null;                     // to contain termination operator
+            string warning = "";
 
-            // check for invalid chars, remove, 
-            for (int i = 0; i < text.Length; i++)
+            // Start Validation of txtNextCalculation.Text
+
+            // do nothing if txtNextCalculation is cleared.
+            if (text.Length == 0)
             {
-                if (!(operatorTerminators.Contains(text[i]) 
-                    || operandDigits.Contains(text[i])))
+                return;
+            }
+
+            // first symbol must be sign or digit
+            if (text.Length >= 1)
+            {
+                // special case: a Calcline was just created and added to the Calculation Object.
+                // the associated listbox was updated with a new 
+                if ((sender as ListBox).Name == lstCalculations.Name
+                    && text.Length == 1
+                    && operatorTerminators.Contains(text[0]))
                 {
-                    invalidCharsFound = true;
+
+                }
+                else if (!operandSigns.Contains(text[0])
+                    && !operandDigits.Contains(text[0]))
+                {
+                    warning = "The first character must be +, -, or a digit.\r\n" 
+                        + operandDescriptionWarning;
                 }
                 else
                 {
-                    calcText += text[i];
+                    calcText += text[0];
                 }
             }
-            txtNextCalculation.Text = calcText;
-            text = calcText;
-            calcText = "";
-
-            if (invalidCharsFound)
+            if (text.Length >= 2)
             {
-                MessageBox.Show(operandDescriptionWarning, "Error");
-            }
-
-            else if (text.Length > 1
-                && operatorTerminators.Contains(text.Substring(text.Length - 1)))
-            {
-
-
-                // remove any whitespace - easier to process.
-                foreach (char c in text)
+                // first two symbols cannot be sign + terminator
+                // must be sign + digit, or digit + terminator
+                if (text.Length == 2 && operandSigns.Contains(text[0]) &&
+                        operatorTerminators.Contains(text[1]))
                 {
-                    if (!Char.IsWhiteSpace(c))
+                    warning = "The calculation contains no digits.\r\n"
+                        + operandDescriptionWarning;
+                    
+                }
+                else
+                {
+                    // check for non digits, remove
+                    for (int i = 1; i < text.Length - 1; i++)
                     {
-                        calcText += c;
+                        if (!operandDigits.Contains(text[i]))
+                        {
+                            warning = "All characters between the first and the last must be a digit.\r\n"
+                                + operandDescriptionWarning;
+                        }
+                        else
+                        {
+                            calcText += text[i];
+                        }
+                    }
+
+                    // last character may be a digit.
+                    if (operandDigits.Contains(text[text.Length - 1]))
+                    {
+                        calcText += text[text.Length - 1];
+                    }
+
+                    // or last character may be a terminating operation.
+                    else if (operatorTerminators.Contains(text[text.Length - 1]))
+                    {
+                        terminator = text[text.Length - 1].ToString();
+                    }
+
+                    // any other last symbol is invalid
+                    else
+                    {
+                        warning = "Last character must be a digit or one of the terminators: " + operatorTerminators + "\r\n"
+                                + "Examples for using terminators: +10+, +10-, +10*, +10/, +10#, +10=";
                     }
                 }
-
-                // separate operand and operator
-                string calcOperand = calcText.Substring(0, calcText.Length - 1);
-                string calcOperator = calcText.Substring(calcText.Length - 1);
-
-                label3.Text = calcOperand;
-                label4.Text = calcOperator;
-
-                // (sub)total operators cannot be used if calculation list is empty, as
-                // there are no calculations to total.
-                if (operatorTotals.Contains(calcOperator) && lstCalculations.Items.Count == 0)
-                {
-                    MessageBox.Show(operandInvalidTotalWarning, "Error");
-                }
             }
+
+            if (warning.Length > 0)
+            {
+                // remove invalid chars from textbox contents.
+                txtNextCalculation.Text = calcText;
+                txtNextCalculation.SelectionStart = txtNextCalculation.Text.Length;
+                txtNextCalculation.SelectionLength = 0;
+                tip.Show(warning, txtNextCalculation, -40, -40, 2000);
+                return;
+            }
+
+            // special case: user requested (sub)total and there are no calculations to total
+            if (lstCalculations.Items.Count == 0
+                && operatorTotals.Contains(text[text.Length - 1]))
+            {
+                warning = operandInvalidTotalWarning;
+            }
+
+            // End of Validation
+
+            // Start of Calc Line Processing
+
+            // only process calculations into Calc Lines if there is a terminating Char.
+            if (terminator != null)
+            {
+                // Create CalcLine object here
+
+                tip.Hide(txtNextCalculation);
+                MessageBox.Show("Calculation = " + calcText + "\r\nOperation = " + terminator, "Notice");
+            }
+
+            // End of Calc Line Processing
+
 
         }
 
@@ -243,6 +304,15 @@ namespace AddStrip
         private void txtSelectedCalculation_TextChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void txtNextCalculation_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter && txtNextCalculation.Text.Length == 0)
+            {
+                MessageBox.Show("Please enter a calculation in the text box.\r\n" +
+                    operandDescriptionWarning, "Notice");
+            }
         }
     }
 }
