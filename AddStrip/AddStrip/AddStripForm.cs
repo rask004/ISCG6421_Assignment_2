@@ -24,8 +24,10 @@ namespace AddStrip
     public partial class frmAddStrip : Form
     {
         // Stores calc lines and manages displayed results.
-        Calculation calculationManager;
+        private Calculation calculationManager;
 
+        // the last file that calculations were saved to.
+        private string saveFilename;
 
 
         //TODO: remove this when testing finished.
@@ -235,7 +237,11 @@ namespace AddStrip
             if (lstCalculations.Items.Count == 0
                 && operatorTotals.Contains(text[text.Length - 1]))
             {
-                warning = operandInvalidTotalWarning;
+                // prevent overwriting of warning is already assigned.
+                if (!warning.Equals("")) 
+                {
+                    warning = operandInvalidTotalWarning;
+                }
             }
 
             if (warning.Length > 0)
@@ -244,7 +250,7 @@ namespace AddStrip
                 txtNextCalculation.Text = calcText;
                 txtNextCalculation.SelectionStart = txtNextCalculation.Text.Length;
                 txtNextCalculation.SelectionLength = 0;
-                tip.Show(warning, txtNextCalculation, -40, -40, 2000);
+                tip.Show(warning, txtNextCalculation, 10, -80, 2000);
                 return;
             }
 
@@ -258,7 +264,7 @@ namespace AddStrip
                 // Create CalcLine object here
                 string calcString = terminator.ToString() + calcText;
                 CalcLine newCalcLine = new CalcLine(calcString);
-                //calculationManager.Add(newCalcLine);
+                calculationManager.Add(newCalcLine);
 
                 // if terminating operator is not a (sub)total, change textbox to only show the operator
                 // otherwise clear the textbox.
@@ -323,8 +329,8 @@ namespace AddStrip
         {
             if (e.KeyCode == Keys.Enter && txtNextCalculation.Text.Length == 0)
             {
-                MessageBox.Show("Please enter a calculation in the text box.\r\n" +
-                    operandDescriptionWarning, "Notice");
+                tip.Show("Please enter a calculation in the text box.\r\n" +
+                    operandDescriptionWarning, txtNextCalculation, 10, -80, 2000);
             }
         }
     }

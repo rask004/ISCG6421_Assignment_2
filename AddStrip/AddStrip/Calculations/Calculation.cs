@@ -48,7 +48,7 @@ namespace AddStrip.Calculations
         {
             theCalcs.Add(cl);
 
-            throw new NotImplementedException();
+            Redisplay();
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace AddStrip.Calculations
         {
             theCalcs.Clear();
 
-            throw new NotImplementedException();
+            Redisplay();
         }
 
         /// <summary>
@@ -91,14 +91,13 @@ namespace AddStrip.Calculations
             if (n >= 0 && n <= theCalcs.Count)
             {
                 CalcLine cl = (CalcLine)theCalcs[n];
+                return cl;
             }
             else
             {
                 throw new IndexOutOfRangeException("index n = " + n +
                     "; range = 0 to " + theCalcs.Count);
             }
-
-            throw new NotImplementedException();
         }
 
         /// <summary>
