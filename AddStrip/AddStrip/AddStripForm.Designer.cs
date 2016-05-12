@@ -62,7 +62,7 @@
             this.tlstrpFileMenu});
             this.mnuAddStrip.Location = new System.Drawing.Point(0, 0);
             this.mnuAddStrip.Name = "mnuAddStrip";
-            this.mnuAddStrip.Size = new System.Drawing.Size(583, 28);
+            this.mnuAddStrip.Size = new System.Drawing.Size(582, 28);
             this.mnuAddStrip.TabIndex = 0;
             this.mnuAddStrip.Text = "mnuFile";
             // 
@@ -141,6 +141,7 @@
             this.lstCalculations.Name = "lstCalculations";
             this.lstCalculations.Size = new System.Drawing.Size(181, 292);
             this.lstCalculations.TabIndex = 1;
+            this.lstCalculations.SelectedIndexChanged += new System.EventHandler(this.lstCalculations_SelectedIndexChanged);
             // 
             // label1
             // 
@@ -211,7 +212,6 @@
             this.txtSelectedCalculation.Name = "txtSelectedCalculation";
             this.txtSelectedCalculation.Size = new System.Drawing.Size(183, 22);
             this.txtSelectedCalculation.TabIndex = 6;
-            this.txtSelectedCalculation.TextChanged += new System.EventHandler(this.txtSelectedCalculation_TextChanged);
             // 
             // label3
             // 
@@ -242,7 +242,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(583, 349);
+            this.ClientSize = new System.Drawing.Size(582, 353);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.panel1);
@@ -252,6 +252,9 @@
             this.Controls.Add(this.lstCalculations);
             this.Controls.Add(this.mnuAddStrip);
             this.MainMenuStrip = this.mnuAddStrip;
+            this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(600, 400);
+            this.MinimumSize = new System.Drawing.Size(600, 400);
             this.Name = "frmAddStrip";
             this.Text = "AddStripForm";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AddStripForm_FormClosing);

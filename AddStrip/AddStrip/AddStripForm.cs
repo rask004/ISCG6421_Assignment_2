@@ -57,7 +57,7 @@ namespace AddStrip
         public frmAddStrip()
         {
             InitializeComponent();
-            lstCalculations.DataSource = new List<String>();
+            saveFilename = null;
             calculationManager = new Calculation(lstCalculations);
         }
 
@@ -89,7 +89,9 @@ namespace AddStrip
         /// <param name="e"></param>
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            calculationManager.Clear();
+            txtSelectedCalculation.Text = "";
+            txtNextCalculation.Text = "";
         }
 
         /// <summary>
@@ -109,7 +111,14 @@ namespace AddStrip
         /// <param name="e"></param>
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            if (saveFilename == null)
+            {
+                saveAsToolStripMenuItem_Click(sender, e);
+            }
+            else
+            {
+                MessageBox.Show("Calculations should be saved here.", "Notice");
+            }
         }
 
         /// <summary>
@@ -120,6 +129,8 @@ namespace AddStrip
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
+
+            MessageBox.Show("Calculations should be saved as here.", "Notice");
         }
 
         /// <summary>
@@ -129,7 +140,7 @@ namespace AddStrip
         /// <param name="e"></param>
         private void printToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            MessageBox.Show("Calculations should be printed here.", "Notice");
         }
 
         /// <summary>
@@ -292,7 +303,11 @@ namespace AddStrip
         /// <param name="e"></param>
         private void btnUpdateCalculation_Click(object sender, EventArgs e)
         {
+            // verify calc line, generate calcline and update
 
+            calculationManager.Replace(new CalcLine(Operator.plus), lstCalculations.SelectedIndex);
+
+            txtSelectedCalculation.Text = "";
         }
 
         /// <summary>
@@ -302,7 +317,17 @@ namespace AddStrip
         /// <param name="e"></param>
         private void btnDeleteCalculation_Click(object sender, EventArgs e)
         {
+            try
+            {
+                calculationManager.Delete(lstCalculations.SelectedIndex);
+            }
+            catch (IndexOutOfRangeException)
+            {
+                tip.Show("Either there are no calculation lines to delete,\r\nor the line you selected could not be found.", 
+                    txtSelectedCalculation, 10, -40, 2000);
+            }
 
+            txtSelectedCalculation.Text = "";
         }
 
         /// <summary>
@@ -312,7 +337,28 @@ namespace AddStrip
         /// <param name="e"></param>
         private void btnInsertCalculation_Click(object sender, EventArgs e)
         {
+            try
+            {
+                // verify calc line, generate calcline and insert
 
+                if (lstCalculations.Items.Count == 0)
+                {
+                    calculationManager.Insert(new CalcLine(Operator.plus), 0);
+                }
+                else
+                {
+                    calculationManager.Insert(new CalcLine(Operator.plus), lstCalculations.SelectedIndex);
+                }
+                
+            }
+            catch (IndexOutOfRangeException)
+            {
+                
+                tip.Show("Either there are no calculation lines to delete,\r\nor the line you selected could not be found.",
+                    txtSelectedCalculation, 10, -40, 2000);
+            }
+
+            txtSelectedCalculation.Text = "";
         }
 
         /// <summary>
@@ -320,17 +366,41 @@ namespace AddStrip
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void txtSelectedCalculation_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
         private void txtNextCalculation_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter && txtNextCalculation.Text.Length == 0)
             {
                 tip.Show("Please enter a calculation in the text box.\r\n" +
                     operandDescriptionWarning, txtNextCalculation, 10, -80, 2000);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void lstCalculations_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (lstCalculations.SelectedIndex < 0)
+            {
+                lstCalculations.SelectedIndex = 0;
+            }
+            else if (lstCalculations.SelectedIndex > lstCalculations.Items.Count)
+            {
+                lstCalculations.SelectedIndex = lstCalculations.Items.Count;
+            }
+
+            try
+            {
+                txtSelectedCalculation.Text
+                        = calculationManager.Find(lstCalculations.SelectedIndex).ToString();
+            }
+            catch (IndexOutOfRangeException)
+            {
+
+                tip.Show("The calculation line selected could not be found.\r\n Try selecting another calculation line.",
+                    txtSelectedCalculation, 10, -40, 2000);
             }
         }
     }

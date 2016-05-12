@@ -76,9 +76,8 @@ namespace AddStrip.Calculations
                 throw new IndexOutOfRangeException("index n = " + n +
                     "; range = 0 to " + theCalcs.Count);
             }
-            
 
-            throw new NotImplementedException();
+            Redisplay();
         }
 
         /// <summary>
@@ -121,7 +120,7 @@ namespace AddStrip.Calculations
                     "; range = 0 to " + theCalcs.Count);
             }
 
-            throw new NotImplementedException();
+            Redisplay();
         }
 
         /// <summary>
@@ -138,7 +137,36 @@ namespace AddStrip.Calculations
         /// </summary>
         public void Redisplay()
         {
-            throw new NotImplementedException();
+
+            // check all known Calc Lines
+            for (int i = 0; i < theCalcs.Count; i++)
+            {
+                var calcString = theCalcs[i].ToString();
+
+                // prepare string if (sub)total
+
+
+                // if new calc line, add to listbox contents
+                // otherwise update contents at relevant indices
+                try
+                {
+                    if (!lstDisplay.Items[i].Equals(theCalcs[i].ToString()))
+                    {
+                        lstDisplay.Items[i] = calcString;
+                    }
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    lstDisplay.Items.Add(calcString);
+                }
+            }
+
+            // if calc lines have been removed, delete the excess listbox lines.
+            while (theCalcs.Count < lstDisplay.Items.Count)
+            {
+                lstDisplay.Items.RemoveAt(lstDisplay.Items.Count - 1);
+            }
+
         }
 
         /// <summary>
@@ -158,7 +186,7 @@ namespace AddStrip.Calculations
                     "; range = 0 to " + theCalcs.Count);
             }
 
-            throw new NotImplementedException();
+            Redisplay();
         }
 
         /// <summary>

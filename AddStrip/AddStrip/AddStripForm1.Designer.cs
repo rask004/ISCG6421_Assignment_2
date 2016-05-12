@@ -61,6 +61,96 @@ namespace AddStrip {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Boolean similar to True.
+        /// </summary>
+        public static bool btnDeleteCalculation_Locked {
+            get {
+                object obj = ResourceManager.GetObject("btnDeleteCalculation.Locked", resourceCulture);
+                return ((bool)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Boolean similar to True.
+        /// </summary>
+        public static bool btnInsertCalculation_Locked {
+            get {
+                object obj = ResourceManager.GetObject("btnInsertCalculation.Locked", resourceCulture);
+                return ((bool)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Boolean similar to True.
+        /// </summary>
+        public static bool btnUpdateCalculation_Locked {
+            get {
+                object obj = ResourceManager.GetObject("btnUpdateCalculation.Locked", resourceCulture);
+                return ((bool)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Boolean similar to True.
+        /// </summary>
+        public static bool label1_Locked {
+            get {
+                object obj = ResourceManager.GetObject("label1.Locked", resourceCulture);
+                return ((bool)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Boolean similar to True.
+        /// </summary>
+        public static bool label2_Locked {
+            get {
+                object obj = ResourceManager.GetObject("label2.Locked", resourceCulture);
+                return ((bool)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Boolean similar to True.
+        /// </summary>
+        public static bool label3_Locked {
+            get {
+                object obj = ResourceManager.GetObject("label3.Locked", resourceCulture);
+                return ((bool)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Boolean similar to True.
+        /// </summary>
+        public static bool label4_Locked {
+            get {
+                object obj = ResourceManager.GetObject("label4.Locked", resourceCulture);
+                return ((bool)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Boolean similar to True.
+        /// </summary>
+        public static bool lstCalculations_Locked {
+            get {
+                object obj = ResourceManager.GetObject("lstCalculations.Locked", resourceCulture);
+                return ((bool)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Boolean similar to True.
+        /// </summary>
+        public static bool mnuAddStrip_Locked {
+            get {
+                object obj = ResourceManager.GetObject("mnuAddStrip.Locked", resourceCulture);
+                return ((bool)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Point similar to {X=17,Y=17}.
         /// </summary>
         public static System.Drawing.Point mnuAddStrip_TrayLocation {
@@ -71,12 +161,42 @@ namespace AddStrip {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Boolean similar to True.
+        /// </summary>
+        public static bool panel1_Locked {
+            get {
+                object obj = ResourceManager.GetObject("panel1.Locked", resourceCulture);
+                return ((bool)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Point similar to {X=164,Y=17}.
         /// </summary>
         public static System.Drawing.Point tip_TrayLocation {
             get {
                 object obj = ResourceManager.GetObject("tip.TrayLocation", resourceCulture);
                 return ((System.Drawing.Point)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Boolean similar to True.
+        /// </summary>
+        public static bool txtNextCalculation_Locked {
+            get {
+                object obj = ResourceManager.GetObject("txtNextCalculation.Locked", resourceCulture);
+                return ((bool)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Boolean similar to True.
+        /// </summary>
+        public static bool txtSelectedCalculation_Locked {
+            get {
+                object obj = ResourceManager.GetObject("txtSelectedCalculation.Locked", resourceCulture);
+                return ((bool)(obj));
             }
         }
     }
