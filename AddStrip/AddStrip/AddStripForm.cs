@@ -344,35 +344,96 @@ namespace AddStrip
         }
 
         /// <summary>
-        /// 
+        ///     Verify a calculation typed into the editing box.
+        ///     calculation line should be of form "operator operand".
+        ///     e.g. * 10, / -5, + 20, - -4.
+        /// </summary>
+        private bool SelectedCalculationIsValid(string calculation)
+        {
+            bool isValid = false;
+
+            string[] calcParts = calculation.Split(new char[] { ' ' });
+            if (calcParts.Length >= 2)
+            {
+                if (operatorTerminators.Contains(calcParts[0]))
+                {
+                    try
+                    {
+                        Convert.ToDouble(calcParts[1]);
+                        isValid = true;
+                    }
+                    catch (FormatException)
+                    {
+                        // calculation not valid
+                    }
+                }
+            }
+            
+            return isValid;
+        }
+
+        /// <summary>
+        ///     Update a selected calculation line.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void btnUpdateCalculation_Click(object sender, EventArgs e)
         {
-            //calculationManager.Replace(new CalcLine(Operator.plus), lstCalculations.SelectedIndex);
+            if (lstCalculations.SelectedIndex < 0 ||
+                !SelectedCalculationIsValid(lstCalculations.Items[
+                    lstCalculations.SelectedIndex].ToString()))
+            {
+                tip.Show("Please first select a calculation line to Update.", txtSelectedCalculation,
+                    10, -40, 2500);
+            }
+            else
+            {
+                calculationManager.Replace(
+                    new CalcLine(lstCalculations.Items[lstCalculations.SelectedIndex].ToString()), 
+                    lstCalculations.SelectedIndex);
+            }
         }
 
         /// <summary>
-        /// 
+        ///     Delete a selected calculation line.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void btnDeleteCalculation_Click(object sender, EventArgs e)
         {
-            //calculationManager.Delete(lstCalculations.SelectedIndex);
-            txtSelectedCalculation.Text = "";
+            if (lstCalculations.SelectedIndex < 0)
+            {
+                tip.Show("Please first select a calculation line to Delete.", 
+                    txtSelectedCalculation,
+                    10, -40, 2500);
+            }
+            else
+            {
+                calculationManager.Delete(lstCalculations.SelectedIndex);
+                txtSelectedCalculation.Text = "";
+            }
         }
 
         /// <summary>
-        /// 
+        ///     Insert a selected calculation line.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void btnInsertCalculation_Click(object sender, EventArgs e)
         {
-            //calculationManager.Insert(new CalcLine(Operator.plus), lstCalculations.SelectedIndex);
-            txtSelectedCalculation.Text = "";
+            if (lstCalculations.SelectedIndex < 0 ||
+                !SelectedCalculationIsValid(lstCalculations.Items[
+                    lstCalculations.SelectedIndex].ToString()))
+            {
+                tip.Show("Please first select a calculation line to Update.", txtSelectedCalculation,
+                    10, -40, 2500);
+            }
+            else
+            {
+                calculationManager.Insert(
+                    new CalcLine(lstCalculations.Items[lstCalculations.SelectedIndex].ToString()),
+                    lstCalculations.SelectedIndex);
+            }
         }
 
         /// <summary>
