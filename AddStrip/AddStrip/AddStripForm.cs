@@ -65,7 +65,8 @@ namespace AddStrip
         /// <param name="e"></param>
         private void AddStripForm_Load(object sender, EventArgs e)
         {
-
+            AddStrip.Testing.TestForm testForm = new AddStrip.Testing.TestForm(this);
+            testForm.Show();
         }
 
         /// <summary>
@@ -157,138 +158,6 @@ namespace AddStrip
         /// <param name="e"></param>
         private void txtNextCalculation_TextChanged(object sender, EventArgs e)
         {
-            string text = txtNextCalculation.Text;
-            string calcText = "";                       // to contain calculation value
-            string terminator = null;                     // to contain termination operator
-            string warning = "";
-
-            // Start Validation of txtNextCalculation.Text
-
-            // do nothing if txtNextCalculation is cleared.
-            if (text.Length == 0)
-            {
-                return;
-            }
-
-            // first symbol must be sign or digit
-            if (text.Length >= 1)
-            {
-                // special case: a Calcline was just added and the textbox has been updated
-                // with the last operator symbol, if the symbol was not a (sub)total
-                if (text.Length == 1
-                    && operatorTerminators.Contains(text[0])
-                    && !operatorTotals.Contains(text[0]))
-                {
-                    return;
-                }
-                else if (!operandSigns.Contains(text[0])
-                    && !operandDigits.Contains(text[0]))
-                {
-                    warning = "The first character must be +, -, or a digit.\r\n" 
-                        + operandDescriptionWarning;
-                }
-                else
-                {
-                    calcText += text[0];
-                }
-            }
-            if (text.Length >= 2)
-            {
-                // first two symbols cannot be sign + terminator
-                // must be sign + digit, or digit + terminator
-                if (text.Length == 2 && operandSigns.Contains(text[0]) &&
-                        operatorTerminators.Contains(text[1]))
-                {
-                    warning = "The calculation contains no digits.\r\n"
-                        + operandDescriptionWarning;
-                    
-                }
-                else
-                {
-                    // check for non digits, remove
-                    for (int i = 1; i < text.Length - 1; i++)
-                    {
-                        if (!operandDigits.Contains(text[i]))
-                        {
-                            warning = "All characters between the first and the last must be a digit.\r\n"
-                                + operandDescriptionWarning;
-                        }
-                        else
-                        {
-                            calcText += text[i];
-                        }
-                    }
-
-                    // last character may be a digit.
-                    if (operandDigits.Contains(text[text.Length - 1]))
-                    {
-                        calcText += text[text.Length - 1];
-                    }
-
-                    // or last character may be a terminating operation.
-                    else if (operatorTerminators.Contains(text[text.Length - 1]))
-                    {
-                        terminator = text[text.Length - 1].ToString();
-                    }
-
-                    // any other last symbol is invalid
-                    else
-                    {
-                        warning = "Last character must be a digit or one of the terminators: " + operatorTerminators + "\r\n"
-                                + "Examples for using terminators: +10+, +10-, +10*, +10/, +10#, +10=";
-                    }
-                }
-            }
-
-            // special case: user requested (sub)total and there are no calculations to total
-            if (lstCalculations.Items.Count == 0
-                && operatorTotals.Contains(text[text.Length - 1]))
-            {
-                // prevent overwriting of warning is already assigned.
-                if (!warning.Equals("")) 
-                {
-                    warning = operandInvalidTotalWarning;
-                }
-            }
-
-            if (warning.Length > 0)
-            {
-                // remove invalid chars from textbox contents.
-                txtNextCalculation.Text = calcText;
-                txtNextCalculation.SelectionStart = txtNextCalculation.Text.Length;
-                txtNextCalculation.SelectionLength = 0;
-                tip.Show(warning, txtNextCalculation, 10, -80, 2000);
-                return;
-            }
-
-            // End of Validation
-
-            // Start of Calc Line Processing
-
-            // only process calculations into Calc Lines if there is a terminating Char.
-            if (terminator != null)
-            {
-                // Create CalcLine object here
-                string calcString = terminator.ToString() + calcText;
-                CalcLine newCalcLine = new CalcLine(calcString);
-                calculationManager.Add(newCalcLine);
-
-                // if terminating operator is not a (sub)total, change textbox to only show the operator
-                // otherwise clear the textbox.
-                tip.Hide(txtNextCalculation);
-                if (!operatorTotals.Contains(terminator))
-                {
-                    txtNextCalculation.Text = terminator.ToString();
-                    txtNextCalculation.Select(0, txtNextCalculation.Text.Length);
-                }
-                else
-                {
-                    txtNextCalculation.Text = "";
-                }
-            }
-
-            // End of Calc Line Processing
-
 
         }
 
@@ -313,17 +182,7 @@ namespace AddStrip
         /// <param name="e"></param>
         private void btnDeleteCalculation_Click(object sender, EventArgs e)
         {
-            try
-            {
-                calculationManager.Delete(lstCalculations.SelectedIndex);
-            }
-            catch (IndexOutOfRangeException)
-            {
-                tip.Show("Either there are no calculation lines to delete,\r\nor the line you selected could not be found.", 
-                    txtSelectedCalculation, 10, -40, 2000);
-            }
 
-            txtSelectedCalculation.Text = "";
         }
 
         /// <summary>
@@ -333,28 +192,7 @@ namespace AddStrip
         /// <param name="e"></param>
         private void btnInsertCalculation_Click(object sender, EventArgs e)
         {
-            try
-            {
-                // verify calc line, generate calcline and insert
 
-                if (lstCalculations.Items.Count == 0)
-                {
-                    calculationManager.Insert(new CalcLine(Operator.plus), 0);
-                }
-                else
-                {
-                    calculationManager.Insert(new CalcLine(Operator.plus), lstCalculations.SelectedIndex);
-                }
-                
-            }
-            catch (IndexOutOfRangeException)
-            {
-                
-                tip.Show("Either there are no calculation lines to delete,\r\nor the line you selected could not be found.",
-                    txtSelectedCalculation, 10, -40, 2000);
-            }
-
-            txtSelectedCalculation.Text = "";
         }
 
         /// <summary>
@@ -378,25 +216,67 @@ namespace AddStrip
         /// <param name="e"></param>
         private void lstCalculations_SelectedIndexChanged(object sender, EventArgs e)
         {
+
+        }
+
+
+        // TODO: remove these handlers after completing test creation.
+
+        private void lstCalculationsMOCK_SelectedIndexChanged(object sender, EventArgs e)
+        {
             if (lstCalculations.SelectedIndex < 0)
             {
-                lstCalculations.SelectedIndex = 0;
+                // indicates no items are present in listbox.
+                return;
             }
             else if (lstCalculations.SelectedIndex > lstCalculations.Items.Count)
             {
                 lstCalculations.SelectedIndex = lstCalculations.Items.Count;
             }
 
-            try
-            {
-                txtSelectedCalculation.Text
-                        = calculationManager.Find(lstCalculations.SelectedIndex).ToString();
-            }
-            catch (IndexOutOfRangeException)
-            {
+            txtSelectedCalculation.Text
+                        = lstCalculations.Items[lstCalculations.SelectedIndex].ToString();
+        }
 
-                tip.Show("The calculation line selected could not be found.\r\n Try selecting another calculation line.",
-                    txtSelectedCalculation, 10, -40, 2000);
+        private void btnUpdateCalculationMOCK_Click(object sender, EventArgs e)
+        {
+
+            lstCalculations.Items[lstCalculations.SelectedIndex]
+                = txtSelectedCalculation.Text;
+
+            txtSelectedCalculation.Text = "";
+        }
+
+        private void btnDeleteCalculationMOCK_Click(object sender, EventArgs e)
+        {
+            
+            lstCalculations.Items.RemoveAt(lstCalculations.SelectedIndex);
+
+            txtSelectedCalculation.Text = "";
+        }
+
+        private void btnInsertCalculationMOCK_Click(object sender, EventArgs e)
+        {
+            lstCalculations.Items.Insert(lstCalculations.SelectedIndex,
+                txtSelectedCalculation.Text);
+
+            txtSelectedCalculation.Text = "";
+        }
+
+        private void txtNextCalculationMOCK_TextChanged(object sender, EventArgs e)
+        {
+            if (txtNextCalculation.Text.Length >= 3
+                && operatorTerminators.Contains(
+                    txtNextCalculation.Text[txtNextCalculation.Text.Length - 1]))
+            {
+                var oldOperator = txtNextCalculation.Text[0];
+                var operand = txtNextCalculation.Text.Substring(1, 
+                    txtNextCalculation.Text.Length - 2);
+                var newOperator = txtNextCalculation.Text
+                    .Substring(txtNextCalculation.Text.Length - 1);
+                lstCalculations.Items.Add(oldOperator.ToString() + " " + operand);
+                txtNextCalculation.Text = newOperator;
+                txtNextCalculation.Select(txtNextCalculation.Text.Length, 0);
             }
         }
     }

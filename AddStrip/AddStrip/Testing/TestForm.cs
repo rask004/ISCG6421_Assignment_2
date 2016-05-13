@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -13,159 +14,83 @@ namespace AddStrip.Testing
 {
     public partial class TestForm : Form
     {
-        static string operandDescriptionWarning = "All Operands should have the form [+ or -]<numbers>." +
-            "\r\nE.G: +10, -20, 5";
-        static string operandAbsentWarning = "You did not enter an Operand in the calculation box.";
-        static string operandInvalidFormatWarning = "The operand could not be converted to a valid number";
-        static string operandInvalidTotalWarning = "There are no calculations to total or subtotal.";
-        static string operatorInvalidTerminationWarning = "Invalid Termination symbol. Must be one of: " + terminators +
-            "\r\nE.G: +10+, +10-, +10*, +10/, +10#, +10=";
+        const string calculationFileExtension = "cal";
+        const string calculationSaveDirectoryDefault = @"C:\temp";
 
-        const string terminators = "+-*/#=";
-        const string signs = "+-";
-        const string digits = "0123456789";
+        frmAddStrip parentFrm;
 
-
-        public TestForm()
+        public TestForm(frmAddStrip frm)
         {
             InitializeComponent();
+            parentFrm = frm;
+        }
+
+        private void button10_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show(textBox1.Text, "Error");
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            string text = textBox1.Text;
-            string calcText = "";
-
-            // remove any whitespace - easier to process.
-            foreach (char c in text)
-            {
-                if (!Char.IsWhiteSpace(c))
-                {
-                    calcText += c;
-                }
-            }
-
-            // calculation text box is empty.
-            if (calcText == "")
-            {
-                button2_Click(this, null);
-                return;
-            }
-            // expect no letters
-            else if (Regex.IsMatch(calcText, @"[a-zA-Z]"))
-            {
-                button3_Click(this, null);
-                return;
-            }
-            // expect only calculation symbols */+-#= and signs +-
-            foreach (Char symbol in @"!@$%^&()_[]{};:'<>,.?`~")
-            {
-                if (calcText.Contains(symbol))
-                {
-                    button3_Click(this, null);
-                    return;
-                }
-            }
-
-
-
-            string calcOperand = calcText.Substring(0, calcText.Length - 1);
-            string calcOperator = calcText.Substring(calcText.Length - 1, 1);
-
-            // must terminate with one of -+/*#=, or for first calculation -+/*
-            if (!terminators.Contains(calcOperator))
-            {
-                button7_Click(this, null);
-            }
-
-            // for first calculation, would check if listbox is empty, then check if terminator is
-            // # or = for error.
-            // don't do this for Testform.
-
-            try
-            {
-                int intOperand = Convert.ToInt32(calcOperand);
-            }
-            catch (FormatException)
-            {
-                button5_Click(this, null);
-            }
-
-            MessageBox.Show("Operand is: " + calcOperand + "; Operator is: " + calcOperator, "Notice");
+            parentFrm.tip.Show(textBox1.Text,
+                parentFrm.txtNextCalculation,
+                10, -80, 5000);
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(operandAbsentWarning, "Error");
+            parentFrm.tip.Show(textBox1.Text,
+                parentFrm.txtSelectedCalculation,
+                10, -80, 5000);
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(operandDescriptionWarning, "Error");
-        }
-
-        private void button5_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show(operandInvalidFormatWarning, "Error");
+            MessageBox.Show("Do you wish to save your changes?", 
+                "Changes have been made", 
+                MessageBoxButtons.YesNo);
         }
 
         private void button4_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(operandInvalidTotalWarning, "Error");
+            Stream myStream;
+            SaveFileDialog saveAsDialog = new SaveFileDialog();
+
+            saveAsDialog.Filter = "calculation files (*."+ calculationFileExtension + ")" +
+                "|*." + calculationFileExtension;
+            saveAsDialog.FilterIndex = 0;
+            saveAsDialog.InitialDirectory = calculationSaveDirectoryDefault;
+            saveAsDialog.RestoreDirectory = false;
+
+            if (saveAsDialog.ShowDialog() == DialogResult.OK)
+            {
+                if ((myStream = saveAsDialog.OpenFile()) != null)
+                {
+                    // Code to write the stream goes here.
+                    myStream.Close();
+                }
+            }
         }
 
-        private void button7_Click(object sender, EventArgs e)
+        private void button5_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(operatorInvalidTerminationWarning, "Error");
-        }
+            OpenFileDialog openFileDialog1 = new OpenFileDialog();
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
-        {
-            bool invalidCharsFound = false;
+            openFileDialog1.InitialDirectory = calculationSaveDirectoryDefault;
+            openFileDialog1.Filter = "calculation files (*." + calculationFileExtension + ")" +
+                "|*." + calculationFileExtension;
+            openFileDialog1.FilterIndex = 0;
+            openFileDialog1.RestoreDirectory = false;
 
-            string text = textBox1.Text;
-            string calcText = "";
-
-            // check for invalid chars, remove, 
-            for (int i=0; i < text.Length; i++)
-            {
-                if(!(terminators.Contains(text[i]) || digits.Contains(text[i])))
-                {
-                    invalidCharsFound = true;
-                }
-                else
-                {
-                    calcText += text[i];
-                }
-            }
-            textBox1.Text = calcText;
-            text = calcText;
-            calcText = "";
-
-            if (invalidCharsFound)
-            {
-                MessageBox.Show(operandDescriptionWarning, "Error");
-            }
-
-            else if (text.Length > 1 
-                && terminators.Contains(text.Substring(text.Length-1)))
-            {
-                
-
-                // remove any whitespace - easier to process.
-                foreach (char c in text)
-                {
-                    if (!Char.IsWhiteSpace(c))
-                    {
-                        calcText += c;
-                    }
-                }
-
-                MessageBox.Show(calcText);
-            }
+            openFileDialog1.ShowDialog();
             
+        }
 
+        private void button6_Click(object sender, EventArgs e)
+        {
+            string[] text = textBox1.Text.Split(new string[] { "\r\n" }, 2, StringSplitOptions.None);
 
+            MessageBox.Show(text[1], text[0]);
         }
     }
 }

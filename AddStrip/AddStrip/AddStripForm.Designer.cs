@@ -141,7 +141,7 @@
             this.lstCalculations.Name = "lstCalculations";
             this.lstCalculations.Size = new System.Drawing.Size(181, 292);
             this.lstCalculations.TabIndex = 1;
-            this.lstCalculations.SelectedIndexChanged += new System.EventHandler(this.lstCalculations_SelectedIndexChanged);
+            this.lstCalculations.SelectedIndexChanged += new System.EventHandler(this.lstCalculationsMOCK_SelectedIndexChanged);
             // 
             // label1
             // 
@@ -182,7 +182,7 @@
             this.btnInsertCalculation.TabIndex = 9;
             this.btnInsertCalculation.Text = "Insert";
             this.btnInsertCalculation.UseVisualStyleBackColor = true;
-            this.btnInsertCalculation.Click += new System.EventHandler(this.btnInsertCalculation_Click);
+            this.btnInsertCalculation.Click += new System.EventHandler(this.btnInsertCalculationMOCK_Click);
             // 
             // btnDeleteCalculation
             // 
@@ -193,7 +193,7 @@
             this.btnDeleteCalculation.TabIndex = 8;
             this.btnDeleteCalculation.Text = "Delete";
             this.btnDeleteCalculation.UseVisualStyleBackColor = true;
-            this.btnDeleteCalculation.Click += new System.EventHandler(this.btnDeleteCalculation_Click);
+            this.btnDeleteCalculation.Click += new System.EventHandler(this.btnDeleteCalculationMOCK_Click);
             // 
             // btnUpdateCalculation
             // 
@@ -204,7 +204,7 @@
             this.btnUpdateCalculation.TabIndex = 7;
             this.btnUpdateCalculation.Text = "Update";
             this.btnUpdateCalculation.UseVisualStyleBackColor = true;
-            this.btnUpdateCalculation.Click += new System.EventHandler(this.btnUpdateCalculation_Click);
+            this.btnUpdateCalculation.Click += new System.EventHandler(this.btnUpdateCalculationMOCK_Click);
             // 
             // txtSelectedCalculation
             // 
@@ -235,7 +235,7 @@
             this.txtNextCalculation.Name = "txtNextCalculation";
             this.txtNextCalculation.Size = new System.Drawing.Size(183, 22);
             this.txtNextCalculation.TabIndex = 3;
-            this.txtNextCalculation.TextChanged += new System.EventHandler(this.txtNextCalculation_TextChanged);
+            this.txtNextCalculation.TextChanged += new System.EventHandler(this.txtNextCalculationMOCK_TextChanged);
             this.txtNextCalculation.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtNextCalculation_KeyDown);
             // 
             // frmAddStrip
@@ -287,10 +287,10 @@
         private System.Windows.Forms.Button btnInsertCalculation;
         private System.Windows.Forms.Button btnDeleteCalculation;
         private System.Windows.Forms.Button btnUpdateCalculation;
-        private System.Windows.Forms.TextBox txtSelectedCalculation;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.ToolTip tip;
-        private System.Windows.Forms.TextBox txtNextCalculation;
+        public System.Windows.Forms.TextBox txtSelectedCalculation;
+        public System.Windows.Forms.TextBox txtNextCalculation;
+        public System.Windows.Forms.ToolTip tip;
     }
 }
