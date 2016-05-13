@@ -31,20 +31,26 @@ namespace AddStrip
         private string saveFilename;
 
 
+        private Boolean changesHaveBeenMade;
+
+
         // Local Constants: UI messages
-        public const string operandDescriptionWarning = "All Operands should have the form [+ or -]<numbers>." +
-            "\r\nE.G: +10, -20, 5";
-        public const string operandAbsentWarning = "You did not enter an Operand in the calculation box.";
-        public const string operandInvalidFormatWarning = "The operand could not be converted to a valid number";
-        public const string operandInvalidTotalWarning = "There are no calculations to total or subtotal.";
-        public const string operatorInvalidTerminationWarning = "Invalid Termination symbol. Must be one of: " + 
-            operatorTerminators +
-            "\r\nE.G: +10+, +10-, +10*, +10/, +10#, +10=";
+        public const string messageOperandDescriptionWarning = "All Calculation line should have the form <operation>[+ or -]<numbers>." +
+            @"\r\nE.G: +10, -+20, \5, -3, *-2, \+6";
+        public const string messageOperandAbsentWarning = "You did not enter a Calculation line in the calculation box.";
+        public const string messageOperandInvalidFormatWarning = "The operand could not be converted to a valid number";
+        public const string messageOperandInvalidTotalWarning = "There are no calculations to total or subtotal.";
+        public const string messageOperatorInvalidTerminationWarning = "Invalid Termination symbol. Must be one of: " + 
+            operatorTerminators;
+        public const string messageSaveChanges = "Do you wish to save your changes?";
 
         // Local Constants: valid calculation symbols
         // More flexible than using a textbox mask - check specific chars, not groups of chars.
-        public const string operatorTerminators = "+-*/#=";
-        public const string operatorTotals = "#=";
+        public const string operatorTerminators = operatorCalculations + operatorTotals;
+        public const string operatorCalculations = "+-*/";
+        public const string operatorTotals = operatorSubTotal + operatorFullTotal;
+        public const string operatorSubTotal = "#";
+        public const string operatorFullTotal = "=";
         public const string operandSigns = "+-";
         public const string operandDigits = "0123456789";
 
@@ -55,6 +61,7 @@ namespace AddStrip
         {
             InitializeComponent();
             saveFilename = null;
+            changesHaveBeenMade = false;
             calculationManager = new Calculation(lstCalculations);
         }
 
@@ -65,8 +72,8 @@ namespace AddStrip
         /// <param name="e"></param>
         private void AddStripForm_Load(object sender, EventArgs e)
         {
-            AddStrip.Testing.TestForm testForm = new AddStrip.Testing.TestForm(this);
-            testForm.Show();
+            calculationManager.Clear();
+            changesHaveBeenMade = false;
         }
 
         /// <summary>
@@ -76,7 +83,10 @@ namespace AddStrip
         /// <param name="e"></param>
         private void AddStripForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            if (changesHaveBeenMade)
+            {
 
+            }
         }
 
         /// <summary>
@@ -159,6 +169,178 @@ namespace AddStrip
         private void txtNextCalculation_TextChanged(object sender, EventArgs e)
         {
 
+            var text = txtNextCalculation.Text;
+            var calcText = "";
+
+            string errorMessage = "";
+
+            // check for invalid chars first, remove all invalid chars, 
+            // if invalid char found, warn user, return
+            for (int i = 0; i < text.Length; i++)
+            {
+                if (!operandDigits.Contains( text[i]) 
+                    && !operatorTerminators.Contains(text[i]))
+                {
+                    errorMessage = messageOperandDescriptionWarning;
+                }
+                else
+                {
+                    calcText += text[i].ToString();
+                }
+            }
+
+            if (errorMessage != "")
+            {
+                // omit any terminating chars.
+                if (operatorTerminators.Contains(calcText[calcText.Length - 1]))
+                {
+                    calcText = calcText.Substring(0, calcText.Length - 1);
+                }
+
+                txtNextCalculation.Text = calcText;
+                tip.Show(errorMessage, txtNextCalculation, 10,
+                    -80, 2500);
+                return;
+            }
+
+            if (calcText.Length == 0)
+            {
+                txtNextCalculation.Text = calcText;
+                return;
+            }
+
+            // otherwise if terminating char has been given, verify this is a calculation
+            // calculation is at least 3 chars long: <operator><operand><terminating char>
+
+            // length=1, check is <operator>
+            if (calcText.Length >= 1)
+            {
+                if (!operatorTerminators.Contains(calcText[0]))
+                {
+                    tip.Show("First symbol must be one of " + operatorTerminators +
+                        "\r\n" + messageOperandDescriptionWarning, txtNextCalculation, 10,
+                        -80, 2500);
+                    txtNextCalculation.Text = calcText;
+                    return;
+                }
+            }
+
+            // length=2, check is <operator><operand sign> or <operator><operand digit>
+            if (calcText.Length >= 2)
+            {
+                if (!(operandSigns.Contains(calcText[1]) || operandDigits.Contains(calcText[1])))
+                {
+                    tip.Show("Second symbol must be an operand sign (" + operandSigns + ") or a digit" +
+                        "\r\n" + messageOperandDescriptionWarning, txtNextCalculation, 10,
+                        -80, 2500);
+                    txtNextCalculation.Text = calcText;
+                    return;
+                }
+                
+            }
+
+            // length>2, check all chars except last are digits.
+            // verify last is terminating char or digit.
+            // then if last is terminating char, process the calculation line.
+            if (calcText.Length >= 3)
+            {
+                for (int i = 2; i < calcText.Length - 1; i++)
+                {
+                    if (!operandDigits.Contains(calcText[i]))
+                    {
+                        tip.Show("Symbols after the leading operation (and any sign) must be digits" +
+                            "\r\n" + messageOperandDescriptionWarning, txtNextCalculation, 10,
+                            -80, 2500);
+                        txtNextCalculation.Text = calcText;
+                        return;
+                    }
+                }
+
+                if (!operatorTerminators.Contains(calcText[calcText.Length - 1])
+                    && !operandDigits.Contains(calcText[calcText.Length - 1]))
+                {
+                    tip.Show("The last symbol must be a digit or one of " + operatorTerminators +
+                        "\r\n" + messageOperandDescriptionWarning, txtNextCalculation, 10,
+                        -80, 2500);
+                    txtNextCalculation.Text = calcText;
+                    return;
+                }
+                else if (operatorTerminators.Contains(calcText[calcText.Length - 1]))
+                {
+                    // MOSTLY verified calculation, and there is a terminating char.
+
+                    // special case: lstBox is empty or last calculation line is =
+                    if (lstCalculations.Items.Count == 0 
+                        || (lstCalculations.Items[
+                            lstCalculations.Items.Count - 1]).ToString().Substring(0,1) == 
+                                operatorFullTotal)
+                    {
+                        // ...and <operator> is not + or -
+                        if (!operandSigns.Contains(calcText[0]))
+                        {
+                            // warn user this is invalid as is start of new calculation
+                            // (+ or -) are required.
+                            tip.Show(
+                                "For a new calculation, the first line must have a + or - operator." +
+                                "\r\n" + messageOperandDescriptionWarning, txtNextCalculation, 10,
+                                -80, 3500);
+                            txtNextCalculation.Text = calcText;
+                            return;
+                        }
+
+                        // ...and terminating char is # or =
+                        else if (operatorTotals.Contains(calcText[calcText.Length - 1]))
+                        {
+                            // warn user this is invalid as there are no calculations to sum.
+                            tip.Show(
+                                "For a new calculation, terminating char cannot be a # or = total because there are no lines to sum." +
+                                "\r\n" + messageOperandDescriptionWarning, txtNextCalculation, 10,
+                                -80, 3500);
+                            txtNextCalculation.Text = calcText;
+                            return;
+                        }
+                    }
+
+                    // pull out each part.
+                    var oldOperator = txtNextCalculation.Text[0].ToString();
+                    var operand = Convert.ToDouble(txtNextCalculation.Text.Substring(1,
+                        txtNextCalculation.Text.Length - 2));
+                    var newOperator = txtNextCalculation.Text
+                        .Substring(txtNextCalculation.Text.Length - 1);
+
+                    MessageBox.Show("oldOperator = " + oldOperator + "\r\n" +
+                        "operand = " + operand + "\r\n" +
+                        "newOperator = " + newOperator);
+
+                    // add the new calculation line.
+                    calculationManager.Add(new CalcLine(oldOperator + " " + operand));
+
+                    // if terminating char is a totalling operator, add (sub)total calc line
+                    if (operatorTotals.Contains(newOperator))
+                    {
+                        switch (newOperator)
+                        {
+                            case operatorSubTotal:
+                                calculationManager.Add(new CalcLine(Operator.subtotal));
+                                newOperator = "";
+                                break;
+
+                            case operatorFullTotal:
+                                calculationManager.Add(new CalcLine(Operator.total));
+                                newOperator = "";
+                                break;
+                        }
+                        
+                    }
+                    
+                    txtNextCalculation.Text = newOperator;
+                    txtNextCalculation.Select(txtNextCalculation.Text.Length, 0);
+                }
+
+                // if reached here, then we have <operation><operand> without terminating char.
+                // don't process contents, leave alone.
+
+            }
         }
 
         /// <summary>
@@ -168,11 +350,7 @@ namespace AddStrip
         /// <param name="e"></param>
         private void btnUpdateCalculation_Click(object sender, EventArgs e)
         {
-            // verify calc line, generate calcline and update
-
-            calculationManager.Replace(new CalcLine(Operator.plus), lstCalculations.SelectedIndex);
-
-            txtSelectedCalculation.Text = "";
+            //calculationManager.Replace(new CalcLine(Operator.plus), lstCalculations.SelectedIndex);
         }
 
         /// <summary>
@@ -182,7 +360,8 @@ namespace AddStrip
         /// <param name="e"></param>
         private void btnDeleteCalculation_Click(object sender, EventArgs e)
         {
-
+            //calculationManager.Delete(lstCalculations.SelectedIndex);
+            txtSelectedCalculation.Text = "";
         }
 
         /// <summary>
@@ -192,7 +371,8 @@ namespace AddStrip
         /// <param name="e"></param>
         private void btnInsertCalculation_Click(object sender, EventArgs e)
         {
-
+            //calculationManager.Insert(new CalcLine(Operator.plus), lstCalculations.SelectedIndex);
+            txtSelectedCalculation.Text = "";
         }
 
         /// <summary>
@@ -205,7 +385,7 @@ namespace AddStrip
             if (e.KeyCode == Keys.Enter && txtNextCalculation.Text.Length == 0)
             {
                 tip.Show("Please enter a calculation in the text box.\r\n" +
-                    operandDescriptionWarning, txtNextCalculation, 10, -80, 2000);
+                    messageOperandDescriptionWarning, txtNextCalculation, 10, -80, 2000);
             }
         }
 
@@ -215,14 +395,6 @@ namespace AddStrip
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void lstCalculations_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-
-        // TODO: remove these handlers after completing test creation.
-
-        private void lstCalculationsMOCK_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (lstCalculations.SelectedIndex < 0)
             {
@@ -234,34 +406,25 @@ namespace AddStrip
                 lstCalculations.SelectedIndex = lstCalculations.Items.Count;
             }
 
-            txtSelectedCalculation.Text
-                        = lstCalculations.Items[lstCalculations.SelectedIndex].ToString();
-        }
-
-        private void btnUpdateCalculationMOCK_Click(object sender, EventArgs e)
-        {
-
-            lstCalculations.Items[lstCalculations.SelectedIndex]
-                = txtSelectedCalculation.Text;
-
-            txtSelectedCalculation.Text = "";
-        }
-
-        private void btnDeleteCalculationMOCK_Click(object sender, EventArgs e)
-        {
+            try
+            {
+                txtSelectedCalculation.Text = calculationManager.Find(
+                    lstCalculations.SelectedIndex).ToString();
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                // This can occur upon deleting or inserting, which may unselect any
+                // selected items in the listbox.
+            }
             
-            lstCalculations.Items.RemoveAt(lstCalculations.SelectedIndex);
 
-            txtSelectedCalculation.Text = "";
+
         }
 
-        private void btnInsertCalculationMOCK_Click(object sender, EventArgs e)
-        {
-            lstCalculations.Items.Insert(lstCalculations.SelectedIndex,
-                txtSelectedCalculation.Text);
 
-            txtSelectedCalculation.Text = "";
-        }
+        // TODO: remove these handlers after completing test creation.
+
+        
 
         private void txtNextCalculationMOCK_TextChanged(object sender, EventArgs e)
         {
