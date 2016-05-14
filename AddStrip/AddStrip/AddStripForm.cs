@@ -168,9 +168,12 @@ namespace AddStrip
                         else
                         {
                             // Code to generate the CalcLines here.
+                            calculationManager.Clear();
+                            foreach (string cl in calcLines)
+                            {
+                                calculationManager.Add(new CalcLine(cl));
+                            }
                         }
-
-
 
                         changesHaveBeenMade = false;
                     }
