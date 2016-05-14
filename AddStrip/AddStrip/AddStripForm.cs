@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using AddStrip.Calculations;
 using System.Collections.ObjectModel;
+using System.IO;
 
 //TODO: complete menu items
 //TODO: complete calculation methods for saving and loading
-//TODO: complete logic for update, insert validation
 
 /// <summary>
 ///     Addstrip Project (ISCG6421 Assignment 2)
@@ -30,9 +30,13 @@ namespace AddStrip
         // the last file that calculations were saved to.
         private string saveFilename;
 
-
         private Boolean changesHaveBeenMade;
 
+        const string calculationFileExtension = "cal";
+        const string calculationSaveDirectoryDefault = @"C:\temp";
+
+        const string fileLineSeparator = "\r\n";
+        const string fileFieldHeader = "~AddStripCalculationLineFile";
 
         // Local Constants: UI messages
         public const string messageOperandDescriptionWarning = "All Calculation line should have the form <operation>[+ or -]<numbers>." +
@@ -43,7 +47,15 @@ namespace AddStrip
         public const string messageOperatorInvalidTerminationWarning = "Invalid Termination symbol. Must be one of: " + 
             operatorTerminators;
         public const string messageSaveChanges = "Do you wish to save your changes?";
-
+        public const string messageOpenFileNullError = "The specified file could not be opened.\r\n" + 
+            "Check the file actually exists and is a calculation file.";
+        public const string messageOpenFileParseError = "Could not parse the selected file." +
+                                "\r\nCheck the file has the correct format." +
+                                "\r\nall files have the format:" +
+                                "\r\n" + fileFieldHeader +
+                                "\r\n" + "<calcLineString>" +
+                                "\r\n" + "...";
+        public const string messageSafeFileSuccess = "Your changes have successfully been saved.";
         // Local Constants: valid calculation symbols
         // More flexible than using a textbox mask - check specific chars, not groups of chars.
         public const string operatorTerminators = operatorCalculations + operatorTotals;
@@ -83,9 +95,12 @@ namespace AddStrip
         /// <param name="e"></param>
         private void AddStripForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (changesHaveBeenMade)
+            if (changesHaveBeenMade &&
+                MessageBox.Show(messageSaveChanges,
+                "Changes have been made", MessageBoxButtons.YesNo)
+                == DialogResult.Yes)
             {
-
+                saveToolStripMenuItem_Click(sender, e);
             }
         }
 
@@ -96,9 +111,17 @@ namespace AddStrip
         /// <param name="e"></param>
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (changesHaveBeenMade &&
+                MessageBox.Show(messageSaveChanges,
+                "Changes have been made", MessageBoxButtons.YesNo) 
+                == DialogResult.Yes)
+            {
+                saveToolStripMenuItem_Click(sender, e);
+            }
             calculationManager.Clear();
             txtSelectedCalculation.Text = "";
             txtNextCalculation.Text = "";
+            changesHaveBeenMade = false;
         }
 
         /// <summary>
@@ -108,9 +131,100 @@ namespace AddStrip
         /// <param name="e"></param>
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (changesHaveBeenMade &&
+                MessageBox.Show(messageSaveChanges,
+                "Changes have been made", MessageBoxButtons.YesNo)
+                == DialogResult.Yes)
+            {
+                saveToolStripMenuItem_Click(sender, e);
+            }
 
+            Stream openStream;
+            OpenFileDialog openDialog = new OpenFileDialog();
+            openDialog.Filter = "calculation files (*." + calculationFileExtension + ")" +
+                "|*." + calculationFileExtension;
+            openDialog.FilterIndex = 0;
+            openDialog.InitialDirectory = calculationSaveDirectoryDefault;
+            openDialog.RestoreDirectory = false;
+
+            if (openDialog.ShowDialog() == DialogResult.OK)
+            {
+                using (openStream = openDialog.OpenFile())
+                {
+                    // if file selected, parse and load if valid
+                    if (openStream != null)
+                    {
+
+                        string[] calcLines = ReadFromCalculationFile(openStream);
+                        
+                        // if file invalid, warn user and load new state.
+                        if (calcLines == null)
+                        {
+                            MessageBox.Show(messageOpenFileParseError, "Error");
+                            calculationManager.Clear();
+                            txtSelectedCalculation.Text = "";
+                            txtNextCalculation.Text = "";
+                        }
+                        else
+                        {
+                            // Code to generate the CalcLines here.
+                        }
+
+
+
+                        changesHaveBeenMade = false;
+                    }
+                    else
+                    {
+                        MessageBox.Show(messageOpenFileNullError, "Error");
+                    }
+                }
+            }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="readStream"></param>
+        /// <returns></returns>
+        private string[] ReadFromCalculationFile(Stream readStream)
+        {
+            List<string> calcStrings = new List<string>();
+
+            // read from stream.
+
+            // if first line is not calc field header, reject steam.
+
+            // read each calc line
+            // discard invalid lines
+
+            // process calc line into correct format
+            // add formatted calc line to calcStrings
+
+            return calcStrings.ToArray();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="readStream"></param>
+        /// <param name="calcStrings"></param>
+        /// <returns></returns>
+        private bool WriteToCalculationFile(Stream writeStream, string[] calcStrings)
+        {
+            bool successful = false;
+
+            using (writeStream)
+            {
+                // write calculation field header
+
+                // for each calcStrings string, write the string, in order given.
+                // if string is not valid, discard it.
+            }
+
+            return successful;
+        }
+        
         /// <summary>
         /// 
         /// </summary>
@@ -124,7 +238,20 @@ namespace AddStrip
             }
             else
             {
-                MessageBox.Show("Calculations should be saved here.", "Notice");
+                Stream saveStream = new FileStream(saveFilename, FileMode.Create);
+
+                // Code to convert the calc lines to text.
+                List<string> calcStrings = new List<string>();
+
+                // Code to write the stream goes here.
+                WriteToCalculationFile(saveStream, calcStrings.ToArray());
+
+                saveStream.Close();
+
+                changesHaveBeenMade = false;
+
+                MessageBox.Show(messageSafeFileSuccess, "Success");
+                        
             }
         }
 
@@ -135,9 +262,31 @@ namespace AddStrip
         /// <param name="e"></param>
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            Stream saveStream;
+            SaveFileDialog saveAsDialog = new SaveFileDialog();
 
+            saveAsDialog.Filter = "calculation files (*." + calculationFileExtension + ")" +
+                "|*." + calculationFileExtension;
+            saveAsDialog.FilterIndex = 0;
+            saveAsDialog.InitialDirectory = calculationSaveDirectoryDefault;
+            saveAsDialog.RestoreDirectory = false;
 
-            MessageBox.Show("Calculations should be saved as here.", "Notice");
+            if (saveAsDialog.ShowDialog() == DialogResult.OK)
+            {
+                saveStream = new FileStream(saveFilename, FileMode.Create);
+
+                // Code to convert the calc lines to text.
+                List<string> calcStrings = new List<string>();
+
+                // Code to write the stream goes here.
+                WriteToCalculationFile(saveStream, calcStrings.ToArray());
+
+                saveStream.Close();
+
+                changesHaveBeenMade = false;
+
+                MessageBox.Show(messageSafeFileSuccess, "Success");
+            }
         }
 
         /// <summary>
