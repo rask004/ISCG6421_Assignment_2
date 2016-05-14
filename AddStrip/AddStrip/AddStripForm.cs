@@ -11,8 +11,7 @@ using AddStrip.Calculations;
 using System.Collections.ObjectModel;
 using System.IO;
 
-//TODO: complete menu items
-//TODO: complete calculation methods for saving and loading
+//TODO: complete print menu item
 
 /// <summary>
 ///     Addstrip Project (ISCG6421 Assignment 2)
@@ -63,6 +62,8 @@ namespace AddStrip
             "Calculation file was parsed but some Calculation Lines" +
             "\r\nCould not be parsed and will be missing. Please Check" +
             "\r\nyour loaded calculations. ";
+        public const string messageNoCalculationsToSaveNotice = 
+            "There are no Calculations to save.";
 
         // Local Constants (valid calculation symbols)
         // More flexible than using a textbox mask - check specific chars, not fixed groups of chars.
@@ -253,27 +254,8 @@ namespace AddStrip
                 // if line is proven invalid, discard it.
                 for (int i = calcStrings.Count - 1; i >= 0; i++)
                 {
-                    string[] tempCalcString = calcStrings[i].Split(
-                        new char[] { ' ' }, 2);
-                    try
+                    if (!selectedCalculationIsValid(calcStrings[i]))
                     {
-                        // valid line has two parts separated by whitespace, first is operator,
-                        // second is operand (double number).
-                        if (!(tempCalcString.Length == 2)
-                            || !(operatorTerminators.Contains(tempCalcString[0])))
-                        {
-                            Convert.ToDouble(tempCalcString[1]);
-                            // line is valid.
-                        }
-                        else
-                        {
-                            calcStrings.RemoveAt(i);
-                            discardedCalcLines = true;
-                        }
-                    }
-                    catch (FormatException)
-                    {
-                        // operand is not double (number), discard.
                         calcStrings.RemoveAt(i);
                         discardedCalcLines = true;
                     }
@@ -299,12 +281,34 @@ namespace AddStrip
         {
             bool successful = false;
 
+            List<byte> buffer = new List<byte>();
+
             using (writeStream)
             {
-                // write calculation field header
+                // write calculation field header and newline
+                foreach (char c in fileFieldHeader)
+                {
+                    buffer.Add(Convert.ToByte(c));
+                }
+
+                foreach (char c in fileLineSeparator)
+                {
+                    buffer.Add(Convert.ToByte(c));
+                }
 
                 // for each calcStrings string, write the string, in order given.
-                // if string is not valid, discard it.
+                for (int i = 0; i < lstCalculations.Items.Count; i++)
+                {
+                    foreach (char c in calculationManager.Find(i).ToString())
+                    {
+                        buffer.Add(Convert.ToByte(c));
+                    }
+
+                    foreach (char c in fileLineSeparator)
+                    {
+                        buffer.Add(Convert.ToByte(c));
+                    }
+                }
             }
 
             return successful;
@@ -317,6 +321,11 @@ namespace AddStrip
         /// <param name="e"></param>
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (lstCalculations.Items.Count == 0)
+            {
+                MessageBox.Show(messageNoCalculationsToSaveNotice, "Notice");
+            }
+
             if (saveFilename == null)
             {
                 saveAsToolStripMenuItem_Click(sender, e);
@@ -355,6 +364,11 @@ namespace AddStrip
             saveAsDialog.FilterIndex = 0;
             saveAsDialog.InitialDirectory = calculationSaveDirectoryDefault;
             saveAsDialog.RestoreDirectory = false;
+
+            if (lstCalculations.Items.Count == 0)
+            {
+                MessageBox.Show(messageNoCalculationsToSaveNotice, "Notice");
+            }
 
             if (saveAsDialog.ShowDialog() == DialogResult.OK)
             {
@@ -582,25 +596,23 @@ namespace AddStrip
         ///     calculation line should be of form "operator operand".
         ///     e.g. * 10, / -5, + 20, - -4.
         /// </summary>
-        private bool SelectedCalculationIsValid(string calculation)
+        private bool selectedCalculationIsValid(string calculation)
         {
             bool isValid = false;
 
-            string[] calcParts = calculation.Split(new char[] { ' ' });
-            if (calcParts.Length >= 2)
+            string[] calcParts = calculation.Split(new char[] { ' ' }, 2);
+            if (calcParts.Length == 2 && operatorTerminators.Contains(calcParts[0]))
             {
-                if (operatorTerminators.Contains(calcParts[0]))
+                try
                 {
-                    try
-                    {
-                        Convert.ToDouble(calcParts[1]);
-                        isValid = true;
-                    }
-                    catch (FormatException)
-                    {
-                        // calculation not valid
-                    }
+                    Convert.ToDouble(calcParts[1]);
+                    isValid = true;
                 }
+                catch (FormatException)
+                {
+                    // calculation not valid
+                }
+                
             }
             
             return isValid;
@@ -614,7 +626,7 @@ namespace AddStrip
         private void btnUpdateCalculation_Click(object sender, EventArgs e)
         {
             if (lstCalculations.SelectedIndex < 0 ||
-                !SelectedCalculationIsValid(lstCalculations.Items[
+                !selectedCalculationIsValid(lstCalculations.Items[
                     lstCalculations.SelectedIndex].ToString()))
             {
                 tip.Show("Please first select a calculation line to Update.", txtSelectedCalculation,
@@ -656,7 +668,7 @@ namespace AddStrip
         private void btnInsertCalculation_Click(object sender, EventArgs e)
         {
             if (lstCalculations.SelectedIndex < 0 ||
-                !SelectedCalculationIsValid(lstCalculations.Items[
+                !selectedCalculationIsValid(lstCalculations.Items[
                     lstCalculations.SelectedIndex].ToString()))
             {
                 tip.Show("Please first select a calculation line to Update.", txtSelectedCalculation,
@@ -711,31 +723,7 @@ namespace AddStrip
                 // This can occur upon deleting or inserting, which may unselect any
                 // selected items in the listbox.
             }
-            
-
-
         }
 
-
-        // TODO: remove these handlers after completing test creation.
-
-        
-
-        private void txtNextCalculationMOCK_TextChanged(object sender, EventArgs e)
-        {
-            if (txtNextCalculation.Text.Length >= 3
-                && operatorTerminators.Contains(
-                    txtNextCalculation.Text[txtNextCalculation.Text.Length - 1]))
-            {
-                var oldOperator = txtNextCalculation.Text[0];
-                var operand = txtNextCalculation.Text.Substring(1, 
-                    txtNextCalculation.Text.Length - 2);
-                var newOperator = txtNextCalculation.Text
-                    .Substring(txtNextCalculation.Text.Length - 1);
-                lstCalculations.Items.Add(oldOperator.ToString() + " " + operand);
-                txtNextCalculation.Text = newOperator;
-                txtNextCalculation.Select(txtNextCalculation.Text.Length, 0);
-            }
-        }
     }
 }
