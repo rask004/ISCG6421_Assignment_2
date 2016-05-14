@@ -30,15 +30,18 @@ namespace AddStrip
         // the last file that calculations were saved to.
         private string saveFilename;
 
+        // keep track of changes.
         private Boolean changesHaveBeenMade;
 
+        // file and directory constants
         const string calculationFileExtension = "cal";
         const string calculationSaveDirectoryDefault = @"C:\temp";
 
+        // file content constants
         const string fileLineSeparator = "\r\n";
         const string fileFieldHeader = "~AddStripCalculationLineFile";
 
-        // Local Constants: UI messages
+        // Local Constants (UI messages)
         public const string messageOperandDescriptionWarning = "All Calculation line should have the form <operation>[+ or -]<numbers>." +
             @"\r\nE.G: +10, -+20, \5, -3, *-2, \+6";
         public const string messageOperandAbsentWarning = "You did not enter a Calculation line in the calculation box.";
@@ -56,8 +59,13 @@ namespace AddStrip
                                 "\r\n" + "<calcLineString>" +
                                 "\r\n" + "...";
         public const string messageSafeFileSuccess = "Your changes have successfully been saved.";
-        // Local Constants: valid calculation symbols
-        // More flexible than using a textbox mask - check specific chars, not groups of chars.
+        public const string messageReadCalcLinesDiscardedWarning =
+            "Calculation file was parsed but some Calculation Lines" +
+            "\r\nCould not be parsed and will be missing. Please Check" +
+            "\r\nyour loaded calculations. ";
+
+        // Local Constants (valid calculation symbols)
+        // More flexible than using a textbox mask - check specific chars, not fixed groups of chars.
         public const string operatorTerminators = operatorCalculations + operatorTotals;
         public const string operatorCalculations = "+-*/";
         public const string operatorTotals = operatorSubTotal + operatorFullTotal;
@@ -167,12 +175,13 @@ namespace AddStrip
                         }
                         else
                         {
-                            // Code to generate the CalcLines here.
+                            // add the CalcLines and display.
                             calculationManager.Clear();
                             foreach (string cl in calcLines)
                             {
                                 calculationManager.Add(new CalcLine(cl));
                             }
+                            calculationManager.Redisplay();
                         }
 
                         changesHaveBeenMade = false;
@@ -194,15 +203,88 @@ namespace AddStrip
         {
             List<string> calcStrings = new List<string>();
 
+            string currentLine = "";
+            char currentChar;
+
+            bool discardedCalcLines;
+
             // read from stream.
+            try
+            {
+                while ((currentChar = Convert.ToChar(readStream.ReadByte())) != -1)
+                {
+                    currentLine += currentChar.ToString();
+                    if (currentLine.Length >= 2
+                        && currentLine.Substring(currentLine.Length - 2).Equals(fileLineSeparator))
+                    {
+                        // completed reading a line.
+                        calcStrings.Add(currentLine);
+                    }
+
+                    // assumed final line ends with a newline substring, as per file format.
+                }
+            }
+
+            // do not catch IOExceptions - can be caused by things external to application.
+
+            catch (NotSupportedException)
+            {
+                // cannot read from stream not set for reading.
+                return null;
+            }     
+            catch (ObjectDisposedException)
+            {
+                // cannot read from stream which is closed.
+                return null;
+            }       
 
             // if first line is not calc field header, reject steam.
+            if (!calcStrings[0].Equals(fileFieldHeader))
+            {
+                return null;
+            }
+            else
+            {
+                calcStrings.RemoveAt(0);
 
-            // read each calc line
-            // discard invalid lines
+                discardedCalcLines = false;
 
-            // process calc line into correct format
-            // add formatted calc line to calcStrings
+                // read each calc line
+                // if line is proven invalid, discard it.
+                for (int i = calcStrings.Count - 1; i >= 0; i++)
+                {
+                    string[] tempCalcString = calcStrings[i].Split(
+                        new char[] { ' ' }, 2);
+                    try
+                    {
+                        // valid line has two parts separated by whitespace, first is operator,
+                        // second is operand (double number).
+                        if (!(tempCalcString.Length == 2)
+                            || !(operatorTerminators.Contains(tempCalcString[0])))
+                        {
+                            Convert.ToDouble(tempCalcString[1]);
+                            // line is valid.
+                        }
+                        else
+                        {
+                            calcStrings.RemoveAt(i);
+                            discardedCalcLines = true;
+                        }
+                    }
+                    catch (FormatException)
+                    {
+                        // operand is not double (number), discard.
+                        calcStrings.RemoveAt(i);
+                        discardedCalcLines = true;
+                    }
+                }
+            }
+
+            if (discardedCalcLines)
+            {
+                // notify user that some calc lines could not be parsed.
+                MessageBox.Show(messageReadCalcLinesDiscardedWarning, "Warning");
+            }
 
             return calcStrings.ToArray();
         }
@@ -210,7 +292,7 @@ namespace AddStrip
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="readStream"></param>
+        /// <param name="writeStream"></param>
         /// <param name="calcStrings"></param>
         /// <returns></returns>
         private bool WriteToCalculationFile(Stream writeStream, string[] calcStrings)
