@@ -148,7 +148,6 @@ namespace AddStrip
                 saveToolStripMenuItem_Click(sender, e);
             }
 
-            Stream openStream;
             OpenFileDialog openDialog = new OpenFileDialog();
             openDialog.Filter = "calculation files (*." + calculationFileExtension + ")" +
                 "|*." + calculationFileExtension;
@@ -158,41 +157,22 @@ namespace AddStrip
 
             if (openDialog.ShowDialog() == DialogResult.OK)
             {
-                using (openStream = openDialog.OpenFile())
+                try
                 {
-                    // if file selected, parse and load if valid
-                    if (openStream != null)
-                    {
-
-                        string[] calcLines = ReadFromCalculationFile(openStream);
-                        
-                        // if file invalid, warn user and load new state.
-                        if (calcLines == null)
-                        {
-                            MessageBox.Show(messageOpenFileParseError, "Error");
-                            calculationManager.Clear();
-                            txtSelectedCalculation.Text = "";
-                            txtNextCalculation.Text = "";
-                        }
-                        else
-                        {
-                            // add the CalcLines and display.
-                            calculationManager.Clear();
-                            foreach (string cl in calcLines)
-                            {
-                                calculationManager.Add(new CalcLine(cl));
-                            }
-                            calculationManager.Redisplay();
-                        }
-
-                        changesHaveBeenMade = false;
-                    }
-                    else
-                    {
-                        MessageBox.Show(messageOpenFileNullError, "Error");
-                    }
+                    // if file cannot be parsed, an exception will be raised.
+                    calculationManager.LoadFromFile(openDialog.FileName);
+                    saveFilename = openDialog.FileName;
                 }
-            }
+                catch
+                {
+                    MessageBox.Show(messageOpenFileParseError, "Error");
+                    calculationManager.Clear();
+                    txtSelectedCalculation.Text = "";
+                    txtNextCalculation.Text = "";
+                }
+
+                changesHaveBeenMade = false;
+            }            
         }
 
         /// <summary>
@@ -332,15 +312,7 @@ namespace AddStrip
             }
             else
             {
-                Stream saveStream = new FileStream(saveFilename, FileMode.Create);
-
-                // Code to convert the calc lines to text.
-                List<string> calcStrings = new List<string>();
-
-                // Code to write the stream goes here.
-                WriteToCalculationFile(saveStream, calcStrings.ToArray());
-
-                saveStream.Close();
+                calculationManager.SaveToFile(saveFilename);
 
                 changesHaveBeenMade = false;
 
@@ -356,7 +328,6 @@ namespace AddStrip
         /// <param name="e"></param>
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Stream saveStream;
             SaveFileDialog saveAsDialog = new SaveFileDialog();
 
             saveAsDialog.Filter = "calculation files (*." + calculationFileExtension + ")" +
@@ -372,15 +343,8 @@ namespace AddStrip
 
             if (saveAsDialog.ShowDialog() == DialogResult.OK)
             {
-                saveStream = new FileStream(saveFilename, FileMode.Create);
-
-                // Code to convert the calc lines to text.
-                List<string> calcStrings = new List<string>();
-
-                // Code to write the stream goes here.
-                WriteToCalculationFile(saveStream, calcStrings.ToArray());
-
-                saveStream.Close();
+                saveFilename = saveAsDialog.FileName;
+                calculationManager.SaveToFile(saveFilename);
 
                 changesHaveBeenMade = false;
 

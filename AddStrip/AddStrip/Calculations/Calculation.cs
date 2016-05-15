@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +24,14 @@ namespace AddStrip.Calculations
 
         // The list of calculation lines made.
         private ArrayList theCalcs;
+
+        // file content constants
+        const string fileLineSeparator = "\r\n";
+        const string fileFieldHeader = "~AddStripCalculationLineFile";
+
+        const string operatorCalculations = "+-*/";
+        const string operatorSubTotal = "#";
+        const string operatorFullTotal = "=";
 
 
         /// <summary>
@@ -129,7 +138,82 @@ namespace AddStrip.Calculations
         /// <param name="filename"></param>
         public void LoadFromFile(string filename)
         {
-            throw new NotImplementedException();
+            Stream readStream;
+            string fileStringData = "";
+
+            // throws IOException, NotSupportedException if file reading error occurs
+            using (readStream = new FileStream(filename, FileMode.Open))
+            {
+                
+                char currentChar;
+
+                while ((currentChar = Convert.ToChar(readStream.ReadByte())) != -1)
+                {
+                    fileStringData += currentChar.ToString();
+
+                }
+            }
+
+            string[] fileStrings = fileStringData.Split(new string[] { fileLineSeparator },
+                StringSplitOptions.None);
+
+            theCalcs.Clear();
+
+            foreach (string fileString in fileStrings)
+            {
+                string[] calcParts = fileString.Split(
+                            new char[] { ' ' }, 2);
+
+                Operator op;
+                Double num = 0;
+                try
+                {
+                    switch (calcParts[0])
+                    {
+                        case "=":
+                            op = Operator.total;
+                            num = 0;
+                            break;
+                        case "#":
+                            op = Operator.subtotal;
+                            num = 0;
+                            break;
+                        case "*":
+                            op = Operator.times;
+                            num = Convert.ToDouble(calcParts[1]);
+                            break;
+                        case "/":
+                            op = Operator.divide;
+                            num = Convert.ToDouble(calcParts[1]);
+                            break;
+                        case "-":
+                            op = Operator.minus;
+                            num = Convert.ToDouble(calcParts[1]);
+                            break;
+                        case "+":
+                            op = Operator.plus;
+                            num = Convert.ToDouble(calcParts[1]);
+                            break;
+                        default:
+                            op = Operator.error;
+                            num = 0;
+                            break;
+                    }
+                }
+                // could not convert. Skip
+                catch (FormatException)
+                {
+                    op = Operator.error;
+                    num = 0;
+                }
+
+                if (op != Operator.error)
+                {
+                    theCalcs.Add(new CalcLine(op, num));
+                }
+            }
+            
+            Redisplay();
         }
 
         /// <summary>
