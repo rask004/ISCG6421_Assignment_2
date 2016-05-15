@@ -51,7 +51,7 @@ namespace AddStrip
         public const string messageSaveChanges = "Do you wish to save your changes?";
         public const string messageOpenFileNullError = "The specified file could not be opened.\r\n" + 
             "Check the file actually exists and is a calculation file.";
-        public const string messageOpenFileParseError = "Could not parse the selected file." +
+        public const string messageFileParseError = "Could not parse the selected file." +
                                 "\r\nCheck the file has the correct format." +
                                 "\r\nall files have the format:" +
                                 "\r\n" + fileFieldHeader +
@@ -165,7 +165,7 @@ namespace AddStrip
                 }
                 catch
                 {
-                    MessageBox.Show(messageOpenFileParseError, "Error");
+                    MessageBox.Show(messageFileParseError, "Error");
                     calculationManager.Clear();
                     txtSelectedCalculation.Text = "";
                     txtNextCalculation.Text = "";
@@ -173,82 +173,6 @@ namespace AddStrip
 
                 changesHaveBeenMade = false;
             }            
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="readStream"></param>
-        /// <returns></returns>
-        private string[] ReadFromCalculationFile(Stream readStream)
-        {
-            List<string> calcStrings = new List<string>();
-
-            string currentLine = "";
-            char currentChar;
-
-            bool discardedCalcLines;
-
-            // read from stream.
-            try
-            {
-                while ((currentChar = Convert.ToChar(readStream.ReadByte())) != -1)
-                {
-                    currentLine += currentChar.ToString();
-                    if (currentLine.Length >= 2
-                        && currentLine.Substring(currentLine.Length - 2).Equals(fileLineSeparator))
-                    {
-                        // completed reading a line.
-                        calcStrings.Add(currentLine);
-                    }
-
-                    // assumed final line ends with a newline substring, as per file format.
-                }
-            }
-
-            // do not catch IOExceptions - can be caused by things external to application.
-
-            catch (NotSupportedException)
-            {
-                // cannot read from stream not set for reading.
-                return null;
-            }     
-            catch (ObjectDisposedException)
-            {
-                // cannot read from stream which is closed.
-                return null;
-            }       
-
-            // if first line is not calc field header, reject steam.
-            if (!calcStrings[0].Equals(fileFieldHeader))
-            {
-                return null;
-            }
-            else
-            {
-                calcStrings.RemoveAt(0);
-
-                discardedCalcLines = false;
-
-                // read each calc line
-                // if line is proven invalid, discard it.
-                for (int i = calcStrings.Count - 1; i >= 0; i++)
-                {
-                    if (!selectedCalculationIsValid(calcStrings[i]))
-                    {
-                        calcStrings.RemoveAt(i);
-                        discardedCalcLines = true;
-                    }
-                }
-            }
-
-            if (discardedCalcLines)
-            {
-                // notify user that some calc lines could not be parsed.
-                MessageBox.Show(messageReadCalcLinesDiscardedWarning, "Warning");
-            }
-
-            return calcStrings.ToArray();
         }
 
         /// <summary>
@@ -312,12 +236,22 @@ namespace AddStrip
             }
             else
             {
-                calculationManager.SaveToFile(saveFilename);
+                try
+                {
+                    calculationManager.SaveToFile(saveFilename);
 
-                changesHaveBeenMade = false;
+                    changesHaveBeenMade = false;
 
-                MessageBox.Show(messageSafeFileSuccess, "Success");
-                        
+                    MessageBox.Show(messageSafeFileSuccess, "Success");
+                }
+                catch (Exception ex)
+                {
+                    if (ex is NotSupportedException ||
+                        ex is IOException)
+                    {
+                        MessageBox.Show(messageFileParseError, "Error");
+                    }
+                }
             }
         }
 
@@ -343,12 +277,23 @@ namespace AddStrip
 
             if (saveAsDialog.ShowDialog() == DialogResult.OK)
             {
-                saveFilename = saveAsDialog.FileName;
-                calculationManager.SaveToFile(saveFilename);
+                try
+                {
+                    calculationManager.SaveToFile(saveAsDialog.FileName);
+                    saveFilename = saveAsDialog.FileName;
 
-                changesHaveBeenMade = false;
+                    changesHaveBeenMade = false;
 
-                MessageBox.Show(messageSafeFileSuccess, "Success");
+                    MessageBox.Show(messageSafeFileSuccess, "Success");
+                }
+                catch (Exception ex)
+                {
+                    if (ex is NotSupportedException ||
+                        ex is IOException)
+                    {
+                        MessageBox.Show(messageFileParseError, "Error");
+                    }
+                }
             }
         }
 

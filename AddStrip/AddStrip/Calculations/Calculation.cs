@@ -221,7 +221,6 @@ namespace AddStrip.Calculations
         /// </summary>
         public void Redisplay()
         {
-            // TODO: complete logic for handling (sub)totals.
 
             double total = 0;
 
@@ -278,7 +277,28 @@ namespace AddStrip.Calculations
         /// <param name="filename"></param>
         public void SaveToFile(string filename)
         {
-            throw new NotImplementedException();
+            List<byte> buffer = new List<byte>();
+
+            // buffer the header
+            foreach (char c in (fileFieldHeader + fileLineSeparator))
+            {
+                buffer.Add(Convert.ToByte(c));
+            }
+
+            // buffer each CalcLine string
+            foreach (CalcLine cl in theCalcs)
+            {
+                foreach (char c in (cl.ToString() + fileLineSeparator))
+                {
+                    buffer.Add(Convert.ToByte(c));
+                }
+            }
+
+            // Write buffer to file.
+            using (FileStream writeStream = new FileStream(filename, FileMode.Create))
+            {
+                writeStream.Write(buffer.ToArray(), 0, buffer.Count);
+            }
         }
     }
 }
