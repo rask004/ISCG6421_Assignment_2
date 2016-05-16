@@ -236,7 +236,7 @@
             this.txtNextCalculation.Size = new System.Drawing.Size(183, 22);
             this.txtNextCalculation.TabIndex = 3;
             this.txtNextCalculation.TextChanged += new System.EventHandler(this.txtNextCalculation_TextChanged);
-            this.txtNextCalculation.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtNextCalculation_KeyDown);
+            this.txtNextCalculation.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtNextCalculation_KeyPress);
             // 
             // frmAddStrip
             // 

@@ -294,183 +294,34 @@ namespace AddStrip
         /// <param name="e"></param>
         private void txtNextCalculation_TextChanged(object sender, EventArgs e)
         {
-
             var text = txtNextCalculation.Text;
-            var calcText = "";
+            var calctext = "";
+            bool invalidCharFound = false;
 
-            string errorMessage = "";
-
-            // check for invalid chars first, remove all invalid chars, 
-            // if invalid char found, warn user, return
-            for (int i = 0; i < text.Length; i++)
+            if (text.Length > 0 )
             {
-                if (!operandDigits.Contains( text[i]) 
-                    && !operatorTerminators.Contains(text[i]))
+                // check for invalid chars first, remove all invalid chars, 
+                // if invalid char found, warn user, return
+                for (int i = 0; i < text.Length; i++)
                 {
-                    errorMessage = messageOperandDescriptionWarning;
-                }
-                else
-                {
-                    calcText += text[i].ToString();
-                }
-            }
-
-            if (errorMessage != "")
-            {
-                // omit any terminating chars.
-                if (calcText.Length > 1 
-                    && operatorTerminators.Contains(calcText[calcText.Length - 1]))
-                {
-                    calcText = calcText.Substring(0, calcText.Length - 1);
-                }
-
-                txtNextCalculation.Text = calcText;
-                tip.Show("Invalid Character.\r\n" + errorMessage, txtNextCalculation, 10,
-                    -80, 2500);
-                return;
-            }
-
-            if (calcText.Length == 0)
-            {
-                txtNextCalculation.Text = calcText;
-                return;
-            }
-
-            // otherwise if terminating char has been given, verify this is a calculation
-            // calculation is at least 3 chars long: <operator><operand><terminating char>
-
-            // length=1, check is <operator>
-            if (calcText.Length >= 1)
-            {
-                if (!operatorCalculations.Contains(calcText[0]))
-                {
-                    tip.Show("First symbol must be one of " + operatorCalculations +
-                        "\r\n" + messageOperandDescriptionWarning, txtNextCalculation, 10,
-                        -80, 2500);
-                    txtNextCalculation.Text = calcText;
-                    txtNextCalculation.Select(txtNextCalculation.Text.Length, 0);
-                    return;
-                }
-            }
-
-            // length=2, check is <operator><operand sign> or <operator><operand digit>
-            if (calcText.Length >= 2)
-            {
-                if (!(operandSigns.Contains(calcText[1]) || operandDigits.Contains(calcText[1])))
-                {
-                    tip.Show("Second symbol must be an operand sign (" + operandSigns + ") or a digit" +
-                        "\r\n" + messageOperandDescriptionWarning, txtNextCalculation, 10,
-                        -80, 2500);
-                    txtNextCalculation.Text = calcText;
-                    txtNextCalculation.Select(txtNextCalculation.Text.Length, 0);
-                    return;
-                }
-                
-            }
-
-            // length>2, check all chars except last are digits.
-            // verify last is terminating char or digit.
-            // then if last is terminating char, process the calculation line.
-            if (calcText.Length >= 3)
-            {
-                for (int i = 2; i < calcText.Length - 1; i++)
-                {
-                    if (!operandDigits.Contains(calcText[i]))
+                    if (!operandDigits.Contains(txtNextCalculation.Text[i])
+                        && !operatorTerminators.Contains(txtNextCalculation.Text[i]))
                     {
-                        tip.Show("Symbols after the leading operation (and any sign) must be digits" +
-                            "\r\n" + messageOperandDescriptionWarning, txtNextCalculation, 10,
-                            -80, 2500);
-                        txtNextCalculation.Text = calcText;
-                        txtNextCalculation.Select(txtNextCalculation.Text.Length, 0);
-                        return;
+                        invalidCharFound = true;
+                    }
+                    else
+                    {
+                        calctext += text[i].ToString();
                     }
                 }
 
-                if (!operatorTerminators.Contains(calcText[calcText.Length - 1])
-                    && !operandDigits.Contains(calcText[calcText.Length - 1]))
+                if (invalidCharFound)
                 {
-                    tip.Show("The last symbol must be a digit or one of " + operatorTerminators +
-                        "\r\n" + messageOperandDescriptionWarning, txtNextCalculation, 10,
-                        -80, 2500);
-                    txtNextCalculation.Text = calcText;
-                    txtNextCalculation.Select(txtNextCalculation.Text.Length, 0);
-                    return;
+                    tip.Show("Invalid Character.\r\n" + messageOperandDescriptionWarning,
+                            txtNextCalculation, 10, -80, 2500);
                 }
-                else if (operatorTerminators.Contains(calcText[calcText.Length - 1]))
-                {
-                    // MOSTLY verified calculation, and there is a terminating char.
-
-                    // special case: lstBox is empty or last calculation line is =
-                    if (lstCalculations.Items.Count == 0 
-                        || (lstCalculations.Items[
-                            lstCalculations.Items.Count - 1]).ToString().Substring(0,1) == 
-                                operatorFullTotal)
-                    {
-                        // ...and <operator> is not + or -
-                        if (!operandSigns.Contains(calcText[0]))
-                        {
-                            // warn user this is invalid as is start of new calculation
-                            // (+ or -) are required.
-                            tip.Show(
-                                "For a new calculation, the first line must have a + or - operator." +
-                                "\r\n" + messageOperandDescriptionWarning, txtNextCalculation, 10,
-                                -80, 3500);
-                            txtNextCalculation.Text = calcText;
-                            txtNextCalculation.Select(txtNextCalculation.Text.Length, 0);
-                            return;
-                        }
-
-                        // ...and terminating char is # or =
-                        else if (operatorTotals.Contains(calcText[calcText.Length - 1]))
-                        {
-                            // warn user this is invalid as there are no calculations to sum.
-                            tip.Show(
-                                "For a new calculation, terminating char cannot be a # or = \r\nbecause there are no lines to sum." +
-                                "\r\n" + messageOperandDescriptionWarning, txtNextCalculation, 10,
-                                -80, 3500);
-                            txtNextCalculation.Text = calcText.Substring(0, calcText.Length - 1);
-                            txtNextCalculation.Select(txtNextCalculation.Text.Length, 0);
-                            return;
-                        }
-                    }
-
-                    // pull out each part.
-                    var oldOperator = txtNextCalculation.Text[0].ToString();
-                    var operand = Convert.ToDouble(txtNextCalculation.Text.Substring(1,
-                        txtNextCalculation.Text.Length - 2));
-                    var newOperator = txtNextCalculation.Text
-                        .Substring(txtNextCalculation.Text.Length - 1);
-
-                    // add the new calculation line.
-                    calculationManager.Add(new CalcLine(oldOperator + " " + operand));
-
-                    // if terminating char is a totalling operator, add (sub)total calc line
-                    if (operatorTotals.Contains(newOperator))
-                    {
-                        switch (newOperator)
-                        {
-                            case operatorSubTotal:
-                                calculationManager.Add(new CalcLine(Operator.subtotal));
-                                newOperator = "";
-                                break;
-
-                            case operatorFullTotal:
-                                calculationManager.Add(new CalcLine(Operator.total));
-                                newOperator = "";
-                                break;
-                        }
-                        
-                    }
-                    
-                    txtNextCalculation.Text = newOperator;
-                    changesHaveBeenMade = true;
-                    txtNextCalculation.Select(txtNextCalculation.Text.Length, 0);
-                }
-
-                // if reached here, then we have <operation><operand> without terminating char.
-                // don't process contents, leave alone.
-
             }
+            
         }
 
         /// <summary>
@@ -569,20 +420,6 @@ namespace AddStrip
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void txtNextCalculation_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Enter && txtNextCalculation.Text.Length == 0)
-            {
-                tip.Show("Please enter a calculation in the text box.\r\n" +
-                    messageOperandDescriptionWarning, txtNextCalculation, 10, -80, 2000);
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void lstCalculations_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (lstCalculations.SelectedIndex < 0)
@@ -607,5 +444,142 @@ namespace AddStrip
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void txtNextCalculation_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            // if key pressed is operator or subtotal, check content
+            if (operatorTerminators.Contains(e.KeyChar))
+            {
+                // if length of 1 and # or =, test if (sub)total is allowed
+                if (txtNextCalculation.Text.Length == 1
+                    && operatorTotals.Contains(e.KeyChar))
+                {
+                    // not allowed if no calc lines to total, or last calcline is same
+                    // type of total
+                    if (lstCalculations.Items.Count == 0 
+                        || operatorTotals.Contains((lstCalculations.Items
+                        [lstCalculations.Items.Count - 1] as string)
+                        .ToString()[0]))
+                    {
+                        // raise warning
+                        tip.Show("Either there are no calculations to total, or the previous\r\n" +
+                            "calculation is the same as the subtotal or total just entered.", 
+                            txtNextCalculation,
+                            10, -40, 2500);
+                    }
+                    else
+                    {
+                        //   generate calcline if allowed, and clear textbox.
+                        if (lstCalculations.Items
+                            [lstCalculations.Items.Count - 1].ToString() == operatorFullTotal)
+                        {
+                            calculationManager.Add(new CalcLine(Operator.total));
+                            txtNextCalculation.Text = "";
+                        }
+                        else if (lstCalculations.Items
+                            [lstCalculations.Items.Count - 1].ToString() == operatorSubTotal)
+                        {
+                            calculationManager.Add(new CalcLine(Operator.subtotal));
+                            txtNextCalculation.Text = "";
+                        }
+                    }
+                }
+
+                StringBuilder calcNumber = new StringBuilder();
+
+                // if length > 1, check if calc line is valid
+                if (txtNextCalculation.Text.Length > 1)
+                {
+                    // if first char is digit, append it
+                    if (operandDigits.Contains( txtNextCalculation.Text[0]))
+                    {
+                        calcNumber.Append(txtNextCalculation.Text[0]);
+                    }
+
+                    // append all remaining chars, except last if not digit
+                    // assume chars are digits - this will be tested shortly
+                    for (int i = 1; i < txtNextCalculation.Text.Length - 1; i++)
+                    {
+                        calcNumber.Append(txtNextCalculation.Text[i]);
+                    }
+
+                    // if last char is digit, append it
+                    if (operandDigits.Contains(
+                        txtNextCalculation.Text[txtNextCalculation.Text.Length - 1]))
+                    {
+                        calcNumber.Append(txtNextCalculation.Text[
+                            txtNextCalculation.Text.Length - 1]);
+                    }
+                }
+
+                // convert to double.
+                try
+                {
+                    Convert.ToDouble(calcNumber);
+                    tip.Show("This calculation contains an error. Check that the calculation matches\r\n" +
+                        "The format <operator><number><operator>, or <number><operator> if this is\r\n" +
+                        "the start of a new set of calculations.",
+                            txtNextCalculation,
+                            10, -40, 2500);
+
+                }
+                catch (FormatException)
+                {
+                    // if conversion failed, raise warning
+
+                    return;
+                }
+
+                // if last char is terminating operator, generate the calcline(s)
+                if (operatorTerminators.Contains( 
+                    txtNextCalculation.Text[txtNextCalculation.Text.Length - 1]) )
+                {
+                    // pull out the leading operator char and the terminating char.
+                    // number already exists as calcNumber
+                    char leadingOperator;
+                    char terminatingOperator;
+
+                    terminatingOperator = 
+                        txtNextCalculation.Text[txtNextCalculation.Text.Length - 1];
+ 
+                    if (operandDigits.Contains(txtNextCalculation.Text[0]))
+                    {
+                        leadingOperator = '+';
+                    }
+                    else
+                    {
+                        leadingOperator = txtNextCalculation.Text[0];
+                    }
+
+                    calculationManager.Add(
+                        new CalcLine(leadingOperator + " " + calcNumber));
+
+                    // if last char is = or #, also generate (sub)total calcline
+                    //   and clear textbox
+                    if (terminatingOperator.ToString() == operatorFullTotal)
+                    {
+                        calculationManager.Add(new CalcLine(Operator.total));
+                        txtNextCalculation.Text = "";
+                    }
+                    else if (terminatingOperator.ToString() == operatorSubTotal)
+                    {
+                        calculationManager.Add(new CalcLine(Operator.subtotal));
+                        txtNextCalculation.Text = "";
+                    }
+                    // if last char is not = or #, replace textbox contents with char
+                    else
+                    {
+                        txtNextCalculation.Text = terminatingOperator.ToString();
+                    }
+                }
+
+
+
+            }
+        }
     }
 }
