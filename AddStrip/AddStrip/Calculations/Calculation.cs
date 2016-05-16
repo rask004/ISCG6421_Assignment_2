@@ -146,70 +146,84 @@ namespace AddStrip.Calculations
             {
                 
                 char currentChar;
+                int currentByte;
 
-                while ((currentChar = Convert.ToChar(readStream.ReadByte())) != -1)
+                while ((currentByte = readStream.ReadByte()) != -1)
                 {
+                    currentChar = Convert.ToChar(currentByte);
                     fileStringData += currentChar.ToString();
-
                 }
             }
 
             string[] fileStrings = fileStringData.Split(new string[] { fileLineSeparator },
                 StringSplitOptions.None);
 
+            // verify this is a calc line file.
+            // first line should be header
+            // rest assumed to be calc line strings.
+
+            if (!fileStrings[0].Equals(fileFieldHeader))
+            {
+                throw new FormatException("File format is not that of a calculation line file.");
+            }
+
             theCalcs.Clear();
 
             foreach (string fileString in fileStrings)
             {
-                string[] calcParts = fileString.Split(
-                            new char[] { ' ' }, 2);
 
-                Operator op;
-                Double num = 0;
-                try
+                if (fileString.Length > 0)
                 {
-                    switch (calcParts[0])
+                    string[] calcParts = fileString.Split(
+                                        new char[] { ' ' }, 2);
+
+                    Operator op;
+                    Double num = 0;
+                    try
                     {
-                        case "=":
-                            op = Operator.total;
-                            num = 0;
-                            break;
-                        case "#":
-                            op = Operator.subtotal;
-                            num = 0;
-                            break;
-                        case "*":
-                            op = Operator.times;
-                            num = Convert.ToDouble(calcParts[1]);
-                            break;
-                        case "/":
-                            op = Operator.divide;
-                            num = Convert.ToDouble(calcParts[1]);
-                            break;
-                        case "-":
-                            op = Operator.minus;
-                            num = Convert.ToDouble(calcParts[1]);
-                            break;
-                        case "+":
-                            op = Operator.plus;
-                            num = Convert.ToDouble(calcParts[1]);
-                            break;
-                        default:
-                            op = Operator.error;
-                            num = 0;
-                            break;
+                        switch (calcParts[0])
+                        {
+                            case "=":
+                                op = Operator.total;
+                                num = 0;
+                                break;
+                            case "#":
+                                op = Operator.subtotal;
+                                num = 0;
+                                break;
+                            case "*":
+                                op = Operator.times;
+                                num = Convert.ToDouble(calcParts[1]);
+                                break;
+                            case "/":
+                                op = Operator.divide;
+                                num = Convert.ToDouble(calcParts[1]);
+                                break;
+                            case "-":
+                                op = Operator.minus;
+                                num = Convert.ToDouble(calcParts[1]);
+                                break;
+                            case "+":
+                                op = Operator.plus;
+                                num = Convert.ToDouble(calcParts[1]);
+                                break;
+                            default:
+                                op = Operator.error;
+                                num = 0;
+                                break;
+                        }
                     }
-                }
-                // could not convert. Skip
-                catch (FormatException)
-                {
-                    op = Operator.error;
-                    num = 0;
-                }
+                    // could not convert. Skip
+                    catch (FormatException)
+                    {
+                        op = Operator.error;
+                        num = 0;
+                    }
 
-                if (op != Operator.error)
-                {
-                    theCalcs.Add(new CalcLine(op, num));
+                    if (op != Operator.error)
+                    {
+                        theCalcs.Add(new CalcLine(op, num));
+                    } 
                 }
             }
             

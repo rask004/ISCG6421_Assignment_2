@@ -42,7 +42,7 @@ namespace AddStrip
 
         // Local Constants (UI messages)
         public const string messageOperandDescriptionWarning = "All Calculation line should have the form <operation>[+ or -]<numbers>." +
-            @"\r\nE.G: +10, -+20, \5, -3, *-2, \+6";
+            "\r\n" + @"E.G: +10, -+20, \5, -3, *-2, \+6";
         public const string messageOperandAbsentWarning = "You did not enter a Calculation line in the calculation box.";
         public const string messageOperandInvalidFormatWarning = "The operand could not be converted to a valid number";
         public const string messageOperandInvalidTotalWarning = "There are no calculations to total or subtotal.";
@@ -130,6 +130,7 @@ namespace AddStrip
             calculationManager.Clear();
             txtSelectedCalculation.Text = "";
             txtNextCalculation.Text = "";
+            saveFilename = null;
             changesHaveBeenMade = false;
         }
 
@@ -163,59 +164,20 @@ namespace AddStrip
                     calculationManager.LoadFromFile(openDialog.FileName);
                     saveFilename = openDialog.FileName;
                 }
-                catch
+                catch (Exception ex)
                 {
-                    MessageBox.Show(messageFileParseError, "Error");
-                    calculationManager.Clear();
-                    txtSelectedCalculation.Text = "";
-                    txtNextCalculation.Text = "";
+                    if (ex is FormatException || ex is IOException)
+                    {
+                        MessageBox.Show(messageFileParseError, "Error");
+                        calculationManager.Clear();
+                        txtSelectedCalculation.Text = "";
+                        txtNextCalculation.Text = "";
+                        saveFilename = null;
+                    }
                 }
 
                 changesHaveBeenMade = false;
             }            
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="writeStream"></param>
-        /// <param name="calcStrings"></param>
-        /// <returns></returns>
-        private bool WriteToCalculationFile(Stream writeStream, string[] calcStrings)
-        {
-            bool successful = false;
-
-            List<byte> buffer = new List<byte>();
-
-            using (writeStream)
-            {
-                // write calculation field header and newline
-                foreach (char c in fileFieldHeader)
-                {
-                    buffer.Add(Convert.ToByte(c));
-                }
-
-                foreach (char c in fileLineSeparator)
-                {
-                    buffer.Add(Convert.ToByte(c));
-                }
-
-                // for each calcStrings string, write the string, in order given.
-                for (int i = 0; i < lstCalculations.Items.Count; i++)
-                {
-                    foreach (char c in calculationManager.Find(i).ToString())
-                    {
-                        buffer.Add(Convert.ToByte(c));
-                    }
-
-                    foreach (char c in fileLineSeparator)
-                    {
-                        buffer.Add(Convert.ToByte(c));
-                    }
-                }
-            }
-
-            return successful;
         }
         
         /// <summary>
@@ -228,6 +190,7 @@ namespace AddStrip
             if (lstCalculations.Items.Count == 0)
             {
                 MessageBox.Show(messageNoCalculationsToSaveNotice, "Notice");
+                return;
             }
 
             if (saveFilename == null)
@@ -262,6 +225,12 @@ namespace AddStrip
         /// <param name="e"></param>
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (lstCalculations.Items.Count == 0)
+            {
+                MessageBox.Show(messageNoCalculationsToSaveNotice, "Notice");
+                return;
+            }
+
             SaveFileDialog saveAsDialog = new SaveFileDialog();
 
             saveAsDialog.Filter = "calculation files (*." + calculationFileExtension + ")" +
@@ -349,13 +318,14 @@ namespace AddStrip
             if (errorMessage != "")
             {
                 // omit any terminating chars.
-                if (operatorTerminators.Contains(calcText[calcText.Length - 1]))
+                if (calcText.Length > 1 
+                    && operatorTerminators.Contains(calcText[calcText.Length - 1]))
                 {
                     calcText = calcText.Substring(0, calcText.Length - 1);
                 }
 
                 txtNextCalculation.Text = calcText;
-                tip.Show(errorMessage, txtNextCalculation, 10,
+                tip.Show("Invalid Character.\r\n" + errorMessage, txtNextCalculation, 10,
                     -80, 2500);
                 return;
             }
@@ -372,12 +342,13 @@ namespace AddStrip
             // length=1, check is <operator>
             if (calcText.Length >= 1)
             {
-                if (!operatorTerminators.Contains(calcText[0]))
+                if (!operatorCalculations.Contains(calcText[0]))
                 {
-                    tip.Show("First symbol must be one of " + operatorTerminators +
+                    tip.Show("First symbol must be one of " + operatorCalculations +
                         "\r\n" + messageOperandDescriptionWarning, txtNextCalculation, 10,
                         -80, 2500);
                     txtNextCalculation.Text = calcText;
+                    txtNextCalculation.Select(txtNextCalculation.Text.Length, 0);
                     return;
                 }
             }
@@ -391,6 +362,7 @@ namespace AddStrip
                         "\r\n" + messageOperandDescriptionWarning, txtNextCalculation, 10,
                         -80, 2500);
                     txtNextCalculation.Text = calcText;
+                    txtNextCalculation.Select(txtNextCalculation.Text.Length, 0);
                     return;
                 }
                 
@@ -409,6 +381,7 @@ namespace AddStrip
                             "\r\n" + messageOperandDescriptionWarning, txtNextCalculation, 10,
                             -80, 2500);
                         txtNextCalculation.Text = calcText;
+                        txtNextCalculation.Select(txtNextCalculation.Text.Length, 0);
                         return;
                     }
                 }
@@ -420,6 +393,7 @@ namespace AddStrip
                         "\r\n" + messageOperandDescriptionWarning, txtNextCalculation, 10,
                         -80, 2500);
                     txtNextCalculation.Text = calcText;
+                    txtNextCalculation.Select(txtNextCalculation.Text.Length, 0);
                     return;
                 }
                 else if (operatorTerminators.Contains(calcText[calcText.Length - 1]))
@@ -442,6 +416,7 @@ namespace AddStrip
                                 "\r\n" + messageOperandDescriptionWarning, txtNextCalculation, 10,
                                 -80, 3500);
                             txtNextCalculation.Text = calcText;
+                            txtNextCalculation.Select(txtNextCalculation.Text.Length, 0);
                             return;
                         }
 
@@ -450,10 +425,11 @@ namespace AddStrip
                         {
                             // warn user this is invalid as there are no calculations to sum.
                             tip.Show(
-                                "For a new calculation, terminating char cannot be a # or = total because there are no lines to sum." +
+                                "For a new calculation, terminating char cannot be a # or = \r\nbecause there are no lines to sum." +
                                 "\r\n" + messageOperandDescriptionWarning, txtNextCalculation, 10,
                                 -80, 3500);
-                            txtNextCalculation.Text = calcText;
+                            txtNextCalculation.Text = calcText.Substring(0, calcText.Length - 1);
+                            txtNextCalculation.Select(txtNextCalculation.Text.Length, 0);
                             return;
                         }
                     }
@@ -464,10 +440,6 @@ namespace AddStrip
                         txtNextCalculation.Text.Length - 2));
                     var newOperator = txtNextCalculation.Text
                         .Substring(txtNextCalculation.Text.Length - 1);
-
-                    MessageBox.Show("oldOperator = " + oldOperator + "\r\n" +
-                        "operand = " + operand + "\r\n" +
-                        "newOperator = " + newOperator);
 
                     // add the new calculation line.
                     calculationManager.Add(new CalcLine(oldOperator + " " + operand));
@@ -491,6 +463,7 @@ namespace AddStrip
                     }
                     
                     txtNextCalculation.Text = newOperator;
+                    changesHaveBeenMade = true;
                     txtNextCalculation.Select(txtNextCalculation.Text.Length, 0);
                 }
 
