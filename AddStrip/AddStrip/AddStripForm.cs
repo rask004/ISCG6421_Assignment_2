@@ -294,34 +294,179 @@ namespace AddStrip
         /// <param name="e"></param>
         private void txtNextCalculation_TextChanged(object sender, EventArgs e)
         {
-            var text = txtNextCalculation.Text;
-            var calctext = "";
-            bool invalidCharFound = false;
+            // skip all processing if there is no text to process.
+            if (txtNextCalculation.Text.Length == 0)
+            {
+                return;
+            }
+            
+            var calctext = "";              // use calctext as temporary store
 
-            if (text.Length > 0 )
+            // firstly remove all invalid chars.
+            // valid ones are stored in calctext.
+            // helps manage copy and pastes as well as changes by keypress.
+            if (txtNextCalculation.Text.Length > 0 )
             {
                 // check for invalid chars first, remove all invalid chars, 
                 // if invalid char found, warn user, return
-                for (int i = 0; i < text.Length; i++)
+                for (int i = 0; i < txtNextCalculation.Text.Length; i++)
                 {
                     if (!operandDigits.Contains(txtNextCalculation.Text[i])
                         && !operatorTerminators.Contains(txtNextCalculation.Text[i]))
                     {
-                        invalidCharFound = true;
+                        // don't store invalid chars.
                     }
                     else
                     {
-                        calctext += text[i].ToString();
+                        calctext += txtNextCalculation.Text[i].ToString();
                     }
                 }
+            }
 
-                if (invalidCharFound)
+            // now, process the remaining text, for valid calc lines.
+            // possible when removing invalid chars, there is no text left, so skip if so.
+            // otherwise, check calcttext
+
+            // no text to process
+            if (calctext.Length == 0)
+            {
+                // don't process if there is no text to process
+            }
+            else
+            {
+                // this is start of a new calculation.
+                // when the next calculation would be the start of a new set of calculations...
+                if ((lstCalculations.Items.Count == 0 ||
+                    calculationManager.Find(lstCalculations.Items.Count - 1).Op
+                    == Operator.total) && !operandDigits.Contains(calctext[0]))
                 {
-                    tip.Show("Invalid Character.\r\n" + messageOperandDescriptionWarning,
-                            txtNextCalculation, 10, -80, 2500);
+                    // ... first char is not digit, raise an Error
+                    tip.Show("This is the start of a new Calculation. \r\n" +
+                        "Your first Calc Line must begin with a digit.\r\n" +
+                        "Format: <numbers><one of " + operatorTerminators + ">",
+                        txtSelectedCalculation,
+                        10, -40, 2500);
+                    calctext = "";
+                    
+                }
+
+                // Calc Line is for only a subtotal.
+                // if we are dealing with a starting calcline and it passed the above branch,
+                // it will skip this branch.
+                else if (operatorSubTotal.Equals(calctext[0].ToString()))
+                {
+                    // subtotal Calc Lines must have a previous calc line to subtotal from.
+                    // cannot have multiple subtotal calclines in a row.
+
+                    // assumed this is not the start of a new set of calculations.
+                    // as a starting calcline must lead with a digit, the previous branch
+                    // should prevent this issue.
+
+                    if (calculationManager.Find(lstCalculations.Items.Count - 1).Op
+                    == Operator.subtotal)
+                    {
+                        //... cannot have multiple subtotals in a row.
+                        tip.Show("The previous Calc Line is a subtotal. \r\n" +
+                            "You cannot have multiple subtotals in a row.",
+                            txtSelectedCalculation,
+                            10, -40, 2500);
+                    }
+                    else
+                    {
+                        // create a subtotal calcline.
+                        calculationManager.Add(new CalcLine(Operator.subtotal));
+                    }
+
+                    calctext = "";
+                }
+
+                // CalcLine is for a total
+                // if we are dealing with a starting calcline and it passed the above branch,
+                // it will skip this branch.
+                else if (operatorFullTotal.Equals(calctext[0].ToString()))
+                {
+                    // assumed this is not the start of a new set of calculations.
+                    // as a starting calcline must lead with a digit, the previous branch
+                    // should prevent this issue.
+
+                    // create a subtotal calcline.
+                    calculationManager.Add(new CalcLine(Operator.total));
+                    calctext = "";
+
+                }
+
+                // A terminating char (see terminatingOperators) has been pressed.
+                // If was the first char of the first calcline in a new calculation,
+                //   or the first char of a following calcline and a subtotal char,
+                //   above branches would have already dealt with this.
+                else if (operatorTerminators.Contains(calctext[calctext.Length - 1]) && calctext.Length > 1)
+                {
+
+                    // break the text into the lead operator, and the string of numbers
+                    // also break out the terminating operator, as the last char
+                    char leadOperator;
+                    StringBuilder numString =
+                        new StringBuilder(calctext.Substring(0, calctext.Length - 1));
+                    char terminatingChar = calctext[calctext.Length - 1];
+
+                    // if no leading Operator, assume it is a plus.
+                    if (operandDigits.Contains(numString[0]))
+                    {
+                        leadOperator = '+';
+                    }
+                    else
+                    {
+                        leadOperator = numString[0];
+                        numString.Remove(0, 1);
+                    }
+
+                    // check the number is a valid number
+                    // if not, issue an error
+                    try
+                    {
+                        Convert.ToDouble(numString.ToString());
+                        // numString is valid Number
+                        // add the calculation
+                        calculationManager.Add(new CalcLine(leadOperator + " " + numString));
+
+                        // if terminating char is not subtotal or total, the textbox should 
+                        // be changed to show only it
+                        // otherwise if it is a total or subtotal, add a (sub)total calcline
+                        // and clear the textbox
+                        if (terminatingChar.ToString() == operatorSubTotal)
+                        {
+                            calculationManager.Add(new CalcLine(Operator.subtotal));
+                            calctext = "";
+                        }
+                        else if (terminatingChar.ToString() == operatorFullTotal)
+                        {
+                            calculationManager.Add(new CalcLine(Operator.total));
+                            calctext = "";
+                        }
+                        else
+                        {
+                            calctext = terminatingChar.ToString();
+                        }
+
+
+                    }
+                    catch (FormatException)
+                    {
+                        tip.Show("The Calculation noes not contain a valid number. \r\n" +
+                            "Format: [One of " + operatorCalculations + "]<digits><One of "
+                            + operatorTerminators + ">",
+                            txtSelectedCalculation,
+                            10, -40, 2500);
+                    }
                 }
             }
-            
+
+            // update the textbox with the new text
+            // this may trigger an event recursion.
+            // the new text is unlikely to trigger more recursions.
+            txtNextCalculation.Text = calctext;
+            txtNextCalculation.Select(txtNextCalculation.Text.Length, 0);
+
         }
 
         /// <summary>
@@ -416,7 +561,8 @@ namespace AddStrip
         }
 
         /// <summary>
-        /// 
+        ///     Remove invalid chars from the text when it changes.
+        ///     No warnings to the user - just do it.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -445,140 +591,151 @@ namespace AddStrip
         }
 
         /// <summary>
-        /// 
+        ///     Examine the next calculation text, and depending on the current
+        ///     set of calculations nand the state of the current text, create
+        ///     Calc Lines as necessary.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void txtNextCalculation_KeyPress(object sender, KeyPressEventArgs e)
         {
-            // if key pressed is operator or subtotal, check content
-            if (operatorTerminators.Contains(e.KeyChar))
+
+            // no text to process
+            if (txtNextCalculation.Text.Length == 0)
             {
-                // if length of 1 and # or =, test if (sub)total is allowed
-                if (txtNextCalculation.Text.Length == 1
-                    && operatorTotals.Contains(e.KeyChar))
+                // don't process if there is no text to process
+                return;
+            }
+
+            // this is start of a new calculation.
+            // when the next calculation would be the start of a new set of calculations...
+            if (lstCalculations.Items.Count == 0 ||
+                (lstCalculations.Items[lstCalculations.Items.Count - 1] as CalcLine).Op
+                == Operator.total)
+            {
+                // .. the first char must be a digit
+                if (!operandDigits.Contains( txtNextCalculation.Text[0]))
                 {
-                    // not allowed if no calc lines to total, or last calcline is same
-                    // type of total
-                    if (lstCalculations.Items.Count == 0 
-                        || operatorTotals.Contains((lstCalculations.Items
-                        [lstCalculations.Items.Count - 1] as string)
-                        .ToString()[0]))
-                    {
-                        // raise warning
-                        tip.Show("Either there are no calculations to total, or the previous\r\n" +
-                            "calculation is the same as the subtotal or total just entered.", 
-                            txtNextCalculation,
-                            10, -40, 2500);
-                    }
-                    else
-                    {
-                        //   generate calcline if allowed, and clear textbox.
-                        if (lstCalculations.Items
-                            [lstCalculations.Items.Count - 1].ToString() == operatorFullTotal)
-                        {
-                            calculationManager.Add(new CalcLine(Operator.total));
-                            txtNextCalculation.Text = "";
-                        }
-                        else if (lstCalculations.Items
-                            [lstCalculations.Items.Count - 1].ToString() == operatorSubTotal)
-                        {
-                            calculationManager.Add(new CalcLine(Operator.subtotal));
-                            txtNextCalculation.Text = "";
-                        }
-                    }
-                }
-
-                StringBuilder calcNumber = new StringBuilder();
-
-                // if length > 1, check if calc line is valid
-                if (txtNextCalculation.Text.Length > 1)
-                {
-                    // if first char is digit, append it
-                    if (operandDigits.Contains( txtNextCalculation.Text[0]))
-                    {
-                        calcNumber.Append(txtNextCalculation.Text[0]);
-                    }
-
-                    // append all remaining chars, except last if not digit
-                    // assume chars are digits - this will be tested shortly
-                    for (int i = 1; i < txtNextCalculation.Text.Length - 1; i++)
-                    {
-                        calcNumber.Append(txtNextCalculation.Text[i]);
-                    }
-
-                    // if last char is digit, append it
-                    if (operandDigits.Contains(
-                        txtNextCalculation.Text[txtNextCalculation.Text.Length - 1]))
-                    {
-                        calcNumber.Append(txtNextCalculation.Text[
-                            txtNextCalculation.Text.Length - 1]);
-                    }
-                }
-
-                // convert to double.
-                try
-                {
-                    Convert.ToDouble(calcNumber);
-                    tip.Show("This calculation contains an error. Check that the calculation matches\r\n" +
-                        "The format <operator><number><operator>, or <number><operator> if this is\r\n" +
-                        "the start of a new set of calculations.",
-                            txtNextCalculation,
-                            10, -40, 2500);
-
-                }
-                catch (FormatException)
-                {
-                    // if conversion failed, raise warning
-
+                    // ... is not digit, raise an Error
+                    tip.Show("This is the start of a new Calculation. \r\n" +
+                        "Your first Calc Line must begin with a digit.\r\n" +
+                        "Format: <numbers><one of " + operatorTerminators +">" ,
+                        txtSelectedCalculation,
+                        10, -40, 2500);
                     return;
                 }
+            }
 
-                // if last char is terminating operator, generate the calcline(s)
-                if (operatorTerminators.Contains( 
-                    txtNextCalculation.Text[txtNextCalculation.Text.Length - 1]) )
+            // Calc Line is for only a subtotal.
+            // if we are dealing with a starting calcline and it passed the above branch,
+            // it will skip this branch.
+            if (!operatorSubTotal.Equals(txtNextCalculation.Text[0].ToString()))
+            {
+                // subtotal Calc Lines must have a previous calc line to subtotal from.
+                // cannot have multiple subtotal calclines in a row.
+
+                // assumed this is not the start of a new set of calculations.
+                // as a starting calcline must lead with a digit, the previous branch
+                // should prevent this issue.
+
+                if ((lstCalculations.Items[lstCalculations.Items.Count - 1] as CalcLine).Op
+                == Operator.subtotal)
                 {
-                    // pull out the leading operator char and the terminating char.
-                    // number already exists as calcNumber
-                    char leadingOperator;
-                    char terminatingOperator;
+                    //... cannot have multiple subtotals in a row.
+                    tip.Show("The previous Calc Line is a subtotal. \r\n" +
+                        "You cannot have multiple subtotals in a row.",
+                        txtSelectedCalculation,
+                        10, -40, 2500);
+                    return;
+                }
+                else
+                {
+                    // create a subtotal calcline.
+                    calculationManager.Add(new CalcLine(Operator.subtotal));
+                    txtNextCalculation.Text = "";
+                    return;
+                }
+            }
 
-                    terminatingOperator = 
-                        txtNextCalculation.Text[txtNextCalculation.Text.Length - 1];
- 
-                    if (operandDigits.Contains(txtNextCalculation.Text[0]))
-                    {
-                        leadingOperator = '+';
-                    }
-                    else
-                    {
-                        leadingOperator = txtNextCalculation.Text[0];
-                    }
+            // CalcLine is for a total
+            // if we are dealing with a starting calcline and it passed the above branch,
+            // it will skip this branch.
+            if (!operatorFullTotal.Equals(txtNextCalculation.Text[0].ToString()))
+            {
+                // assumed this is not the start of a new set of calculations.
+                // as a starting calcline must lead with a digit, the previous branch
+                // should prevent this issue.
 
-                    calculationManager.Add(
-                        new CalcLine(leadingOperator + " " + calcNumber));
+                // create a subtotal calcline.
+                calculationManager.Add(new CalcLine(Operator.total));
+                txtNextCalculation.Text = "";
+                return;
+                
+            }
 
-                    // if last char is = or #, also generate (sub)total calcline
-                    //   and clear textbox
-                    if (terminatingOperator.ToString() == operatorFullTotal)
-                    {
-                        calculationManager.Add(new CalcLine(Operator.total));
-                        txtNextCalculation.Text = "";
-                    }
-                    else if (terminatingOperator.ToString() == operatorSubTotal)
+            // A terminating char (see terminatingOperators) has been pressed.
+            // If was the first char of the first calcline in a new calculation,
+            //   or the first char of a following calcline and a subtotal char,
+            //   above branches would have already dealt with this.
+            if (operatorTerminators.Contains( e.KeyChar))
+            {
+
+                // break the text into the lead operator, and the string of numbers
+                // terminating operator is already present as e.KeyChar
+                char leadOperator;
+                StringBuilder numString =
+                    new StringBuilder(txtNextCalculation.Text
+                    .Substring(0, txtNextCalculation.Text.Count() - 1));
+
+                // if no leading Operator, assume it is a plus.
+                if (operandDigits.Contains(numString[0]))
+                {
+                    leadOperator = '+';
+                }
+                else
+                {
+                    leadOperator = numString[0];
+                    numString.Remove(0, 1);
+                }
+
+                // check the number is a valid number
+                // if not, issue an error
+                try
+                {
+                    Convert.ToDouble(numString);
+                    // numString is valid Number
+                    // add the calculation
+                    calculationManager.Add(new CalcLine(leadOperator + " " + numString));
+
+                    // if terminating char is not subtotal or total, the textbox should 
+                    // be changed to show only it
+                    // otherwise if it is a total or subtotal, add a (sub)total calcline
+                    // and clear the textbox
+                    if (e.KeyChar.ToString() == operatorSubTotal)
                     {
                         calculationManager.Add(new CalcLine(Operator.subtotal));
                         txtNextCalculation.Text = "";
                     }
-                    // if last char is not = or #, replace textbox contents with char
+                    else if (e.KeyChar.ToString() == operatorFullTotal)
+                    {
+                        calculationManager.Add(new CalcLine(Operator.total));
+                        txtNextCalculation.Text = "";
+                    }
                     else
                     {
-                        txtNextCalculation.Text = terminatingOperator.ToString();
+                        txtNextCalculation.Text = e.KeyChar.ToString();
                     }
+
+
                 }
-
-
-
+                catch (FormatException)
+                {
+                    tip.Show("The Calculation noes not contain a valid number. \r\n" +
+                        "Format: [One of " + operatorCalculations + "]<digits><One of " 
+                        + operatorTerminators + ">",
+                        txtSelectedCalculation,
+                        10, -40, 2500);
+                }
             }
         }
     }
