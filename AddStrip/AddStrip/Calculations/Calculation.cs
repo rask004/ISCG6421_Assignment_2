@@ -254,7 +254,7 @@ namespace AddStrip.Calculations
                 if (currentCalcLine.Op == Operator.subtotal ||
                     currentCalcLine.Op == Operator.total)
                 {
-                    calcString += " <" + total + ">";
+                    calcString += "  << " + total ;
                 }
 
                 if (currentCalcLine.Op == Operator.total)

@@ -310,7 +310,7 @@ namespace AddStrip
         ///     Then determine if a calculation has been typed.
         ///     If so, try to add it to the current set of calculations.
         ///     If not possible (because it violates the calculation rules), warn user
-        ///     
+        ///     also if a calculation is added, note that changes have been made.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -494,6 +494,7 @@ namespace AddStrip
             // the new text is unlikely to trigger more recursions.
             txtNextCalculation.Text = calctext;
             txtNextCalculation.Select(txtNextCalculation.Text.Length, 0);
+            changesHaveBeenMade = true;
 
         }
 
@@ -739,6 +740,12 @@ namespace AddStrip
             }
         }
 
+        /// <summary>
+        ///     If enter is pressed and the add calculation textbox is empty,
+        ///     send notice to user to enter a calculation.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void txtNextCalculation_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter && txtNextCalculation.Text.Length == 0)
@@ -749,7 +756,11 @@ namespace AddStrip
             }
         }
 
-
+        /// <summary>
+        ///     helper method for tool tips.
+        ///     places tooltip in same location each time.
+        /// </summary>
+        /// <param name="message"></param>
         private void showToolTipMessageNearNextCalculationTextbox(string message)
         {
             tip.Show(message, txtNextCalculation,
