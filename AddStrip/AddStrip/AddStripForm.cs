@@ -514,7 +514,7 @@ namespace AddStrip
         /// <param name="e"></param>
         private void btnUpdateCalculation_Click(object sender, EventArgs e)
         {
-            if (lstCalculations.SelectedIndex < 0 )
+            if (lstCalculations.SelectedIndex == -1 )
             {
                 tip.Show("Please first select a calculation line to Update.", txtSelectedCalculation,
                     10, -40, 2500);
@@ -612,6 +612,11 @@ namespace AddStrip
                     "Try add a new calculation. ", txtSelectedCalculation,
                     10, -40, 2500);
             }
+            else if (lstCalculations.SelectedIndex == -1)
+            {
+                tip.Show("Select a calculation to insert above.", txtSelectedCalculation,
+                    10, -40, 2500);
+            }
             else if (!selectedCalculationIsValid(lstCalculations.Items[
                     lstCalculations.SelectedIndex].ToString()))
             {
@@ -619,11 +624,57 @@ namespace AddStrip
                     "A valid calculation has the form \"<operator>  <digits>\"", txtSelectedCalculation,
                     10, -40, 2500);
             }
-            else if (lstCalculations.SelectedIndex == -1)
+
+
+
+            // first calcline in any set of calculations must start with - or +
+            else if ((lstCalculations.SelectedIndex == 0
+                || lstCalculations.Items.Count > 1 &&
+                lstCalculations.SelectedIndex > 0 &&
+                calculationManager.Find(lstCalculations.SelectedIndex - 1).Op
+                == Operator.total)
+                && (!operandSigns.Contains(txtSelectedCalculation.Text[0])
+                ))
             {
-                tip.Show("Select a calculation to insert above.", txtSelectedCalculation,
+                tip.Show("The first calc line in any calculation must have a + or - operator.",
+                    txtSelectedCalculation,
                     10, -40, 2500);
             }
+
+            // cannot put a subtotal after another subtotal or before another subtotal
+            else if (lstCalculations.Items.Count > 1
+                && operatorSubTotal.Contains(txtSelectedCalculation.Text[0])
+                && ((lstCalculations.SelectedIndex - 1 > -1
+                        && calculationManager.Find(lstCalculations.SelectedIndex - 1).Op
+                        == Operator.subtotal))
+                    || (calculationManager.Find(lstCalculations.SelectedIndex).Op
+                        == Operator.subtotal)
+                )
+            {
+                tip.Show("You cannot place multiple subtotals in a row.\r\n" +
+                    "Check your calculations and where you are placing the subtotal.",
+                    txtSelectedCalculation,
+                    10, -40, 2500);
+            }
+
+            // cannot insert a total before another total or after another total.
+            else if (lstCalculations.Items.Count > 1
+                && operatorFullTotal.Contains(txtSelectedCalculation.Text[0])
+                && ((lstCalculations.SelectedIndex - 1 > -1
+                        && calculationManager.Find(lstCalculations.SelectedIndex - 1).Op
+                        == Operator.total))
+                    || (calculationManager.Find(lstCalculations.SelectedIndex).Op
+                        == Operator.total)
+                )
+            {
+                tip.Show("You cannot place a total before or after an existing total.\r\n" +
+                    "Check your calculations and where you are placing this total.",
+                    txtSelectedCalculation,
+                    10, -40, 2500);
+            }
+
+
+
             else
             {
                 calculationManager.Insert(
