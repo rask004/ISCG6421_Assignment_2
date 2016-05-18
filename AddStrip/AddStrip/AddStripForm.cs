@@ -329,6 +329,8 @@ namespace AddStrip
             // helps manage copy and pastes as well as changes by keypress.
             if (txtNextCalculation.Text.Length > 0 )
             {
+                bool invalidCharsFound = false;
+
                 // check for invalid chars first, remove all invalid chars, 
                 // if invalid char found, warn user, return
                 for (int i = 0; i < txtNextCalculation.Text.Length; i++)
@@ -337,11 +339,18 @@ namespace AddStrip
                         && !operatorTerminators.Contains(txtNextCalculation.Text[i]))
                     {
                         // don't store invalid chars.
+                        invalidCharsFound = true;
                     }
                     else
                     {
                         calctext += txtNextCalculation.Text[i].ToString();
                     }
+                }
+
+                if (invalidCharsFound)
+                {
+                    showToolTipMessageNearNextCalculationTextbox(
+                        "Only the characters \"0123456789#=+-*/\" are allowed.");
                 }
             }
 
@@ -363,11 +372,10 @@ namespace AddStrip
                     == Operator.total) && !operandDigits.Contains(calctext[0]))
                 {
                     // ... first char is not digit, raise an Error
-                    tip.Show("This is the start of a new Calculation. \r\n" +
+                    showToolTipMessageNearNextCalculationTextbox(
+                        "This is the start of a new Calculation. \r\n" +
                         "Your first Calc Line must begin with a digit.\r\n" +
-                        "Format: <numbers><one of " + operatorTerminators + ">",
-                        txtSelectedCalculation,
-                        10, -40, 2500);
+                        "Format: <numbers><one of " + operatorTerminators + ">");
                     calctext = "";
                     
                 }
@@ -388,10 +396,9 @@ namespace AddStrip
                     == Operator.subtotal)
                     {
                         //... cannot have multiple subtotals in a row.
-                        tip.Show("The previous Calc Line is a subtotal. \r\n" +
-                            "You cannot have multiple subtotals in a row.",
-                            txtSelectedCalculation,
-                            10, -40, 2500);
+                        showToolTipMessageNearNextCalculationTextbox(
+                            "The previous Calc Line is a subtotal. \r\n" +
+                            "You cannot have multiple subtotals in a row.");
                     }
                     else
                     {
@@ -474,11 +481,10 @@ namespace AddStrip
                     }
                     catch (FormatException)
                     {
-                        tip.Show("The Calculation noes not contain a valid number. \r\n" +
+                        showToolTipMessageNearNextCalculationTextbox(
+                            "The Calculation noes not contain a valid number. \r\n" +
                             "Format: [One of " + operatorCalculations + "]<digits><One of "
-                            + operatorTerminators + ">",
-                            txtSelectedCalculation,
-                            10, -40, 2500);
+                            + operatorTerminators + ">");
                     }
                 }
             }
@@ -540,14 +546,14 @@ namespace AddStrip
         {
             if (lstCalculations.SelectedIndex == -1 )
             {
-                tip.Show("Please first select a calculation line to Update.", txtSelectedCalculation,
-                    10, -40, 2500);
+                showToolTipMessageNearNextCalculationTextbox(
+                    "Please first select a calculation line to Update.");
             }
             else if (!selectedCalculationIsValid(txtSelectedCalculation.Text))
             {
-                tip.Show("The calculation you entered was not valid.\r\n" +
-                    "A valid calculation has the form \"<operator>  <digits>\"", txtSelectedCalculation,
-                    10, -40, 2500);
+                showToolTipMessageNearNextCalculationTextbox(
+                    "The calculation you entered was not valid.\r\n" +
+                    "A valid calculation has the form \"<operator>  <digits>\"");
             }
             // first calcline in any set of calculations must start with - or +
             else if ((lstCalculations.SelectedIndex == 0
@@ -558,9 +564,8 @@ namespace AddStrip
                 && ( !operandSigns.Contains(txtSelectedCalculation.Text[0])
                 ))
             {
-                tip.Show("The first calc line in any calculation must have a + or - operator.", 
-                    txtSelectedCalculation,
-                    10, -40, 2500);
+                showToolTipMessageNearNextCalculationTextbox(
+                    "The first calc line in any calculation must have a + or - operator.");
             }
 
             // cannot put a subtotal after another subtotal or before another subtotal
@@ -574,10 +579,9 @@ namespace AddStrip
                         == Operator.subtotal)
                 )
             {
-                tip.Show("You cannot place multiple subtotals in a row.\r\n" +
-                    "Check your calculations and where you are placing the subtotal.",
-                    txtSelectedCalculation,
-                    10, -40, 2500);
+                showToolTipMessageNearNextCalculationTextbox(
+                    "You cannot place multiple subtotals in a row.\r\n" +
+                    "Check your calculations and where you are placing the subtotal.");
             }
 
             // cannot place a total before another total.
@@ -588,10 +592,9 @@ namespace AddStrip
                         == Operator.total)
                 ))
             {
-                tip.Show("You cannot place a total before an existing total.\r\n" +
-                    "Check your calculations and where you are placing the subtotal.",
-                    txtSelectedCalculation,
-                    10, -40, 2500);
+                showToolTipMessageNearNextCalculationTextbox(
+                    "You cannot place a total before an existing total.\r\n" +
+                    "Check your calculations and where you are placing the subtotal.");
             }
 
             else
@@ -613,9 +616,8 @@ namespace AddStrip
         {
             if (lstCalculations.SelectedIndex < 0)
             {
-                tip.Show("Please first select a calculation line to Delete.", 
-                    txtSelectedCalculation,
-                    10, -40, 2500);
+                showToolTipMessageNearNextCalculationTextbox(
+                    "Please first select a calculation line to Delete.");
             }
             else
             {
@@ -636,21 +638,20 @@ namespace AddStrip
             
             if (lstCalculations.Items.Count == 0)
             {
-                tip.Show("There are no calculations to insert above.\r\n" +
-                    "Try add a new calculation. ", txtSelectedCalculation,
-                    10, -40, 2500);
+                showToolTipMessageNearNextCalculationTextbox(
+                    "There are no calculations to insert above.\r\n");
             }
             else if (lstCalculations.SelectedIndex == -1)
             {
-                tip.Show("Select a calculation to insert above.", txtSelectedCalculation,
-                    10, -40, 2500);
+                showToolTipMessageNearNextCalculationTextbox(
+                    "Select a calculation to insert above.");
             }
             else if (!selectedCalculationIsValid(lstCalculations.Items[
                     lstCalculations.SelectedIndex].ToString()))
             {
-                tip.Show("The calculation you entered was not valid.\r\n" +
-                    "A valid calculation has the form \"<operator>  <digits>\"", txtSelectedCalculation,
-                    10, -40, 2500);
+                showToolTipMessageNearNextCalculationTextbox(
+                    "The calculation you entered was not valid.\r\n" +
+                    "A valid calculation has the form \"<operator>  <digits>\"");
             }
 
 
@@ -664,9 +665,8 @@ namespace AddStrip
                 && (!operandSigns.Contains(txtSelectedCalculation.Text[0])
                 ))
             {
-                tip.Show("The first calc line in any calculation must have a + or - operator.",
-                    txtSelectedCalculation,
-                    10, -40, 2500);
+                showToolTipMessageNearNextCalculationTextbox(
+                    "The first calc line in any calculation must have a + or - operator.");
             }
 
             // cannot put a subtotal after another subtotal or before another subtotal
@@ -679,10 +679,9 @@ namespace AddStrip
                         == Operator.subtotal)
                 )
             {
-                tip.Show("You cannot place multiple subtotals in a row.\r\n" +
-                    "Check your calculations and where you are placing the subtotal.",
-                    txtSelectedCalculation,
-                    10, -40, 2500);
+                showToolTipMessageNearNextCalculationTextbox(
+                    "You cannot place multiple subtotals in a row.\r\n" +
+                    "Check your calculations and where you are placing the subtotal.");
             }
 
             // cannot insert a total before another total or after another total.
@@ -695,10 +694,9 @@ namespace AddStrip
                         == Operator.total)
                 )
             {
-                tip.Show("You cannot place a total before or after an existing total.\r\n" +
-                    "Check your calculations and where you are placing this total.",
-                    txtSelectedCalculation,
-                    10, -40, 2500);
+                showToolTipMessageNearNextCalculationTextbox(
+                    "You cannot place a total before or after an existing total.\r\n" +
+                    "Check your calculations and where you are placing this total.");
             }
 
 
@@ -740,5 +738,23 @@ namespace AddStrip
                 // selected items in the listbox.
             }
         }
+
+        private void txtNextCalculation_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter && txtNextCalculation.Text.Length == 0)
+            {
+                showToolTipMessageNearNextCalculationTextbox(
+                    "Please enter a calculation.");
+
+            }
+        }
+
+
+        private void showToolTipMessageNearNextCalculationTextbox(string message)
+        {
+            tip.Show(message, txtNextCalculation,
+                    -10, 25, 3000);
+        }
+
     }
 }
