@@ -115,7 +115,9 @@ namespace AddStrip.Calculations
         /// <param name="n"></param>
         public void Insert(CalcLine newCalc, int n)
         {
-            if (n > theCalcs.Count)
+            // if lstDisplay is empty, selectedindex will be -1
+            // or if the index is too big
+            if (n == -1 || n > theCalcs.Count)
             {
                 Add(newCalc);
             }
@@ -283,6 +285,7 @@ namespace AddStrip.Calculations
             }
 
             Redisplay();
+            lstDisplay.SelectedIndex = n;
         }
 
         /// <summary>
