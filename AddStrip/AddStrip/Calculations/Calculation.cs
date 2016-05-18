@@ -50,9 +50,9 @@ namespace AddStrip.Calculations
         }
 
         /// <summary>
-        /// 
+        ///     Add a calc line object.
         /// </summary>
-        /// <param name="cl"></param>
+        /// <param name="cl">calc line object</param>
         public void Add(CalcLine cl)
         {
             theCalcs.Add(cl);
@@ -61,7 +61,7 @@ namespace AddStrip.Calculations
         }
 
         /// <summary>
-        /// 
+        ///     Remove all calc line objects.
         /// </summary>
         public void Clear()
         {
@@ -71,9 +71,9 @@ namespace AddStrip.Calculations
         }
 
         /// <summary>
-        /// 
+        ///     Remove a calc line object at an index.
         /// </summary>
-        /// <param name="n"></param>
+        /// <param name="n">index of the calc line object to remove.</param>
         public void Delete(int n)
         {
             if (n >= 0 && n <= theCalcs.Count)
@@ -90,10 +90,10 @@ namespace AddStrip.Calculations
         }
 
         /// <summary>
-        /// 
+        ///     Find a calc line object at an index.
         /// </summary>
-        /// <param name="n"></param>
-        /// <returns></returns>
+        /// <param name="n">an index integer.</param>
+        /// <returns>The calc line object found at n.</returns>
         public CalcLine Find(int n)
         {
             if (n >= 0 && n <= theCalcs.Count)
@@ -109,10 +109,10 @@ namespace AddStrip.Calculations
         }
 
         /// <summary>
-        /// 
+        ///     Insert a new calc line object at an index.
         /// </summary>
-        /// <param name="newCalc"></param>
-        /// <param name="n"></param>
+        /// <param name="newCalc">new calc line object.</param>
+        /// <param name="n">index integer.</param>
         public void Insert(CalcLine newCalc, int n)
         {
             // if lstDisplay is empty, selectedindex will be -1
@@ -135,9 +135,9 @@ namespace AddStrip.Calculations
         }
 
         /// <summary>
-        /// 
+        ///     Load a set of calc line objects to a file.
         /// </summary>
-        /// <param name="filename"></param>
+        /// <param name="filename">filename to load from.</param>
         public void LoadFromFile(string filename)
         {
             Stream readStream;
@@ -233,7 +233,7 @@ namespace AddStrip.Calculations
         }
 
         /// <summary>
-        /// 
+        ///     update an associated display object (likely a form control).
         /// </summary>
         public void Redisplay()
         {
@@ -268,10 +268,10 @@ namespace AddStrip.Calculations
         }
 
         /// <summary>
-        /// 
+        ///     Replace a calc line object at an index.
         /// </summary>
-        /// <param name="newCalc"></param>
-        /// <param name="n"></param>
+        /// <param name="newCalc">new calc line object.</param>
+        /// <param name="n">index integer.</param>
         public void Replace(CalcLine newCalc, int n)
         {
             if (n >= 0 && n <= theCalcs.Count)
@@ -289,9 +289,9 @@ namespace AddStrip.Calculations
         }
 
         /// <summary>
-        /// 
+        ///     Save a set of calc line objects to a file.
         /// </summary>
-        /// <param name="filename"></param>
+        /// <param name="filename">filename to save to.</param>
         public void SaveToFile(string filename)
         {
             List<byte> buffer = new List<byte>();

@@ -55,7 +55,7 @@ namespace AddStrip.Calculations
         /// <summary>
         ///     Remove a calc line object at an index.
         /// </summary>
-        /// <param name="newCalc">new calc line object.</param>
+        /// <param name="n">inddex of the calc line object to remove.</param>
         void Delete(int n);
 
         /// <summary>
