@@ -57,7 +57,7 @@ namespace AddStrip
                                 "\r\n" + fileFieldHeader +
                                 "\r\n" + "<calcLineString>" +
                                 "\r\n" + "...";
-        public const string messageSafeFileSuccess = "Your changes have successfully been saved.";
+        public const string messageSaveFileSuccess = "Your changes have successfully been saved.";
         public const string messageReadCalcLinesDiscardedWarning =
             "Calculation file was parsed but some Calculation Lines" +
             "\r\nCould not be parsed and will be missing. Please Check" +
@@ -89,7 +89,7 @@ namespace AddStrip
         /// <summary>
         ///     Load additional objects. 
         /// </summary>
-        /// <param name="sender"></param>
+        /// <param name="sender">Furrent form</param>
         /// <param name="e"></param>
         private void AddStripForm_Load(object sender, EventArgs e)
         {
@@ -98,9 +98,10 @@ namespace AddStrip
         }
 
         /// <summary>
-        /// 
+        ///     When closing, ask to save changes, and save changes as requested
+        ///     if changesHaveBeenMade is true.
         /// </summary>
-        /// <param name="sender"></param>
+        /// <param name="sender">current form</param>
         /// <param name="e"></param>
         private void AddStripForm_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -114,9 +115,10 @@ namespace AddStrip
         }
 
         /// <summary>
-        /// 
+        ///     If requested, save changes first
+        ///     Then clear the form of calculations.
         /// </summary>
-        /// <param name="sender"></param>
+        /// <param name="sender">either the Form or the New ToolStrip Item</param>
         /// <param name="e"></param>
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -135,9 +137,11 @@ namespace AddStrip
         }
 
         /// <summary>
-        /// 
+        ///     Open a calculations file and load the calculations.
+        ///     give opportunity to save changes first, and save as requested.
+        ///     If loading fails, warn the user and start a new session.
         /// </summary>
-        /// <param name="sender"></param>
+        /// <param name="sender">current form ot the toolstrip item</param>
         /// <param name="e"></param>
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -174,6 +178,10 @@ namespace AddStrip
                         txtNextCalculation.Text = "";
                         saveFilename = null;
                     }
+                    else
+                    {
+                        throw ex;
+                    }
                 }
 
                 changesHaveBeenMade = false;
@@ -181,7 +189,8 @@ namespace AddStrip
         }
         
         /// <summary>
-        /// 
+        ///     Save the current set of calculations.
+        ///     If no filename is stored, defer to the Save As method.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -205,7 +214,7 @@ namespace AddStrip
 
                     changesHaveBeenMade = false;
 
-                    MessageBox.Show(messageSafeFileSuccess, "Success");
+                    MessageBox.Show(messageSaveFileSuccess, "Success");
                 }
                 catch (Exception ex)
                 {
@@ -214,12 +223,17 @@ namespace AddStrip
                     {
                         MessageBox.Show(messageFileParseError, "Error");
                     }
+                    else
+                    {
+                        throw ex;
+                    }
                 }
             }
         }
 
         /// <summary>
-        /// 
+        ///     Save the current set of calculations, with the option to choose
+        ///     a filename. 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -253,7 +267,7 @@ namespace AddStrip
 
                     changesHaveBeenMade = false;
 
-                    MessageBox.Show(messageSafeFileSuccess, "Success");
+                    MessageBox.Show(messageSaveFileSuccess, "Success");
                 }
                 catch (Exception ex)
                 {
@@ -262,12 +276,17 @@ namespace AddStrip
                     {
                         MessageBox.Show(messageFileParseError, "Error");
                     }
+                    else
+                    {
+                        throw ex;
+                    }
                 }
             }
         }
 
         /// <summary>
-        /// 
+        ///     Print the calculations.
+        ///     Show a preview window first.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -277,7 +296,7 @@ namespace AddStrip
         }
 
         /// <summary>
-        /// 
+        ///     Exit the application.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -288,6 +307,9 @@ namespace AddStrip
 
         /// <summary>
         ///     Verify calculation lines entered into the new calculation textbox.
+        ///     Then determine if a calculation has been typed.
+        ///     If so, try to add it to the current set of calculations.
+        ///     If not possible (because it violates the calculation rules), warn user
         ///     
         /// </summary>
         /// <param name="sender"></param>
@@ -509,6 +531,8 @@ namespace AddStrip
 
         /// <summary>
         ///     Update a selected calculation line.
+        ///     Update according to the calculation rules
+        ///     If rules are violated, warn the user.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -580,6 +604,8 @@ namespace AddStrip
 
         /// <summary>
         ///     Delete a selected calculation line.
+        ///     Update according to the calculation rules
+        ///     If rules are violated, warn the user.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -600,6 +626,8 @@ namespace AddStrip
 
         /// <summary>
         ///     Insert a selected calculation line.
+        ///     Update according to the calculation rules
+        ///     If rules are violated, warn the user.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -684,10 +712,10 @@ namespace AddStrip
         }
 
         /// <summary>
-        ///     Remove invalid chars from the text when it changes.
-        ///     No warnings to the user - just do it.
+        ///     When choosing a new calculation line, load the text into the editing box
+        ///     load from the calculation manager, not the display control.
         /// </summary>
-        /// <param name="sender"></param>
+        /// <param name="sender">the indexable control displaying the calculation set.</param>
         /// <param name="e"></param>
         private void lstCalculations_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -710,155 +738,6 @@ namespace AddStrip
             {
                 // This can occur upon deleting or inserting, which may unselect any
                 // selected items in the listbox.
-            }
-        }
-
-        /// <summary>
-        ///     Examine the next calculation text, and depending on the current
-        ///     set of calculations nand the state of the current text, create
-        ///     Calc Lines as necessary.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void txtNextCalculation_KeyPress(object sender, KeyPressEventArgs e)
-        {
-
-            // no text to process
-            if (txtNextCalculation.Text.Length == 0)
-            {
-                // don't process if there is no text to process
-                return;
-            }
-
-            // this is start of a new calculation.
-            // when the next calculation would be the start of a new set of calculations...
-            if (lstCalculations.Items.Count == 0 ||
-                (lstCalculations.Items[lstCalculations.Items.Count - 1] as CalcLine).Op
-                == Operator.total)
-            {
-                // .. the first char must be a digit
-                if (!operandDigits.Contains( txtNextCalculation.Text[0]))
-                {
-                    // ... is not digit, raise an Error
-                    tip.Show("This is the start of a new Calculation. \r\n" +
-                        "Your first Calc Line must begin with a digit.\r\n" +
-                        "Format: <numbers><one of " + operatorTerminators +">" ,
-                        txtSelectedCalculation,
-                        10, -40, 2500);
-                    return;
-                }
-            }
-
-            // Calc Line is for only a subtotal.
-            // if we are dealing with a starting calcline and it passed the above branch,
-            // it will skip this branch.
-            if (!operatorSubTotal.Equals(txtNextCalculation.Text[0].ToString()))
-            {
-                // subtotal Calc Lines must have a previous calc line to subtotal from.
-                // cannot have multiple subtotal calclines in a row.
-
-                // assumed this is not the start of a new set of calculations.
-                // as a starting calcline must lead with a digit, the previous branch
-                // should prevent this issue.
-
-                if ((lstCalculations.Items[lstCalculations.Items.Count - 1] as CalcLine).Op
-                == Operator.subtotal)
-                {
-                    //... cannot have multiple subtotals in a row.
-                    tip.Show("The previous Calc Line is a subtotal. \r\n" +
-                        "You cannot have multiple subtotals in a row.",
-                        txtSelectedCalculation,
-                        10, -40, 2500);
-                    return;
-                }
-                else
-                {
-                    // create a subtotal calcline.
-                    calculationManager.Add(new CalcLine(Operator.subtotal));
-                    txtNextCalculation.Text = "";
-                    return;
-                }
-            }
-
-            // CalcLine is for a total
-            // if we are dealing with a starting calcline and it passed the above branch,
-            // it will skip this branch.
-            if (!operatorFullTotal.Equals(txtNextCalculation.Text[0].ToString()))
-            {
-                // assumed this is not the start of a new set of calculations.
-                // as a starting calcline must lead with a digit, the previous branch
-                // should prevent this issue.
-
-                // create a subtotal calcline.
-                calculationManager.Add(new CalcLine(Operator.total));
-                txtNextCalculation.Text = "";
-                return;
-                
-            }
-
-            // A terminating char (see terminatingOperators) has been pressed.
-            // If was the first char of the first calcline in a new calculation,
-            //   or the first char of a following calcline and a subtotal char,
-            //   above branches would have already dealt with this.
-            if (operatorTerminators.Contains( e.KeyChar))
-            {
-
-                // break the text into the lead operator, and the string of numbers
-                // terminating operator is already present as e.KeyChar
-                char leadOperator;
-                StringBuilder numString =
-                    new StringBuilder(txtNextCalculation.Text
-                    .Substring(0, txtNextCalculation.Text.Count() - 1));
-
-                // if no leading Operator, assume it is a plus.
-                if (operandDigits.Contains(numString[0]))
-                {
-                    leadOperator = '+';
-                }
-                else
-                {
-                    leadOperator = numString[0];
-                    numString.Remove(0, 1);
-                }
-
-                // check the number is a valid number
-                // if not, issue an error
-                try
-                {
-                    Convert.ToDouble(numString);
-                    // numString is valid Number
-                    // add the calculation
-                    calculationManager.Add(new CalcLine(leadOperator + " " + numString));
-
-                    // if terminating char is not subtotal or total, the textbox should 
-                    // be changed to show only it
-                    // otherwise if it is a total or subtotal, add a (sub)total calcline
-                    // and clear the textbox
-                    if (e.KeyChar.ToString() == operatorSubTotal)
-                    {
-                        calculationManager.Add(new CalcLine(Operator.subtotal));
-                        txtNextCalculation.Text = "";
-                    }
-                    else if (e.KeyChar.ToString() == operatorFullTotal)
-                    {
-                        calculationManager.Add(new CalcLine(Operator.total));
-                        txtNextCalculation.Text = "";
-                    }
-                    else
-                    {
-                        txtNextCalculation.Text = e.KeyChar.ToString();
-                    }
-
-
-                }
-                catch (FormatException)
-                {
-                    tip.Show("The Calculation noes not contain a valid number. \r\n" +
-                        "Format: [One of " + operatorCalculations + "]<digits><One of " 
-                        + operatorTerminators + ">",
-                        txtSelectedCalculation,
-                        10, -40, 2500);
-                }
             }
         }
     }
