@@ -509,6 +509,12 @@ namespace AddStrip
 
             string[] calcParts = calculation.Split(new char[] { ' ' }, 2);
 
+            // calculation cannot be "" or null
+            if (calculation == null || calculation.Equals(""))
+            {
+                return false;
+            }
+
             // calculation can be "#" or "="
             if (calcParts.Length == 1 
                 && operatorTotals.Contains(calcParts[0]))
@@ -615,7 +621,12 @@ namespace AddStrip
         /// <param name="e"></param>
         private void btnDeleteCalculation_Click(object sender, EventArgs e)
         {
-            if (lstCalculations.SelectedIndex < 0)
+            if (lstCalculations.Items.Count == 0)
+            {
+                showToolTipMessageNearNextCalculationTextbox(
+                    "There are no calculations to delete.\r\n");
+            }
+            else if (lstCalculations.SelectedIndex < 0)
             {
                 showToolTipMessageNearNextCalculationTextbox(
                     "Please first select a calculation line to Delete.");
@@ -647,15 +658,12 @@ namespace AddStrip
                 showToolTipMessageNearNextCalculationTextbox(
                     "Select a calculation to insert above.");
             }
-            else if (!selectedCalculationIsValid(lstCalculations.Items[
-                    lstCalculations.SelectedIndex].ToString()))
+            else if (!selectedCalculationIsValid(txtSelectedCalculation.Text))
             {
                 showToolTipMessageNearNextCalculationTextbox(
                     "The calculation you entered was not valid.\r\n" +
                     "A valid calculation has the form \"<operator>  <digits>\"");
             }
-
-
 
             // first calcline in any set of calculations must start with - or +
             else if ((lstCalculations.SelectedIndex == 0
@@ -704,9 +712,12 @@ namespace AddStrip
 
             else
             {
+                int index = lstCalculations.SelectedIndex;
                 calculationManager.Insert(
                     new CalcLine(txtSelectedCalculation.Text),
                     lstCalculations.SelectedIndex);
+                lstCalculations.SelectedIndex = index;
+
             }
         }
 
