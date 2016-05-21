@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmAddStrip));
             this.mnuAddStrip = new System.Windows.Forms.MenuStrip();
             this.tlstrpFileMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.tlstrpItemNew = new System.Windows.Forms.ToolStripMenuItem();
@@ -51,6 +52,9 @@
             this.label4 = new System.Windows.Forms.Label();
             this.tip = new System.Windows.Forms.ToolTip(this.components);
             this.txtNextCalculation = new System.Windows.Forms.TextBox();
+            this.printCalculation = new System.Drawing.Printing.PrintDocument();
+            this.printPreviewDialogCalculation = new System.Windows.Forms.PrintPreviewDialog();
+            this.printDialogCalculation = new System.Windows.Forms.PrintDialog();
             this.mnuAddStrip.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -238,6 +242,26 @@
             this.txtNextCalculation.TextChanged += new System.EventHandler(this.txtNextCalculation_TextChanged);
             this.txtNextCalculation.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtNextCalculation_KeyDown);
             // 
+            // printCalculation
+            // 
+            this.printCalculation.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(this.printCalculation_PrintPage);
+            // 
+            // printPreviewDialogCalculation
+            // 
+            this.printPreviewDialogCalculation.AutoScrollMargin = new System.Drawing.Size(0, 0);
+            this.printPreviewDialogCalculation.AutoScrollMinSize = new System.Drawing.Size(0, 0);
+            this.printPreviewDialogCalculation.ClientSize = new System.Drawing.Size(400, 300);
+            this.printPreviewDialogCalculation.Document = this.printCalculation;
+            this.printPreviewDialogCalculation.Enabled = true;
+            this.printPreviewDialogCalculation.Icon = ((System.Drawing.Icon)(resources.GetObject("printPreviewDialogCalculation.Icon")));
+            this.printPreviewDialogCalculation.Name = "printPreviewDialogCalculation";
+            this.printPreviewDialogCalculation.Visible = false;
+            // 
+            // printDialogCalculation
+            // 
+            this.printDialogCalculation.Document = this.printCalculation;
+            this.printDialogCalculation.UseEXDialog = true;
+            // 
             // frmAddStrip
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -292,5 +316,8 @@
         public System.Windows.Forms.TextBox txtSelectedCalculation;
         public System.Windows.Forms.TextBox txtNextCalculation;
         public System.Windows.Forms.ToolTip tip;
+        private System.Drawing.Printing.PrintDocument printCalculation;
+        private System.Windows.Forms.PrintPreviewDialog printPreviewDialogCalculation;
+        private System.Windows.Forms.PrintDialog printDialogCalculation;
     }
 }

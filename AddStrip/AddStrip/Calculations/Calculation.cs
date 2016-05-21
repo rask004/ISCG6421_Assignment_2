@@ -33,6 +33,8 @@ namespace AddStrip.Calculations
         const string operatorSubTotal = "#";
         const string operatorFullTotal = "=";
 
+        public const string indicatorTotalText = "<<";
+
 
         /// <summary>
         ///     construct the Calculation object, given a listbox to display calculation results to.
@@ -254,7 +256,7 @@ namespace AddStrip.Calculations
                 if (currentCalcLine.Op == Operator.subtotal ||
                     currentCalcLine.Op == Operator.total)
                 {
-                    calcString += "  << " + total ;
+                    calcString += "  " + indicatorTotalText + " " + total.ToString("F4") ;
                 }
 
                 if (currentCalcLine.Op == Operator.total)

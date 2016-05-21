@@ -10,6 +10,8 @@ using System.Windows.Forms;
 using AddStrip.Calculations;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Collections;
+using System.Drawing.Printing;
 
 //TODO: complete print menu item
 
@@ -32,13 +34,18 @@ namespace AddStrip
         // keep track of changes.
         private Boolean changesHaveBeenMade;
 
+        // store string data for printing
+        private List<string> printLines;
+
+        public static readonly Font PrintFont = new Font("Arial", 12);
+
         // file and directory constants
-        const string calculationFileExtension = "cal";
-        const string calculationSaveDirectoryDefault = @"C:\temp";
+        public const string calculationFileExtension = "cal";
+        public const string calculationSaveDirectoryDefault = @"C:\temp";
 
         // file content constants
-        const string fileLineSeparator = "\r\n";
-        const string fileFieldHeader = "~AddStripCalculationLineFile";
+        public const string fileLineSeparator = "\r\n";
+        public const string fileFieldHeader = "~AddStripCalculationLineFile";
 
         // Local Constants (UI messages)
         public const string messageOperandDescriptionWarning = "All Calculation line should have the form <operation>[+ or -]<numbers>." +
@@ -74,6 +81,8 @@ namespace AddStrip
         public const string operatorFullTotal = "=";
         public const string operandSigns = "+-";
         public const string operandDigits = "0123456789";
+
+        public const string indicatorTotalText = "<<";
 
         /// <summary>
         ///     Constructor
@@ -286,13 +295,58 @@ namespace AddStrip
 
         /// <summary>
         ///     Print the calculations.
-        ///     Show a preview window first.
+        ///     First generate the list of strings which will be used for printing.
+        ///     Next load the Print Preview Dialog.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void printToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Calculations should be printed here.", "Notice");
+            // list filled with string lines, to print
+            printLines = new List< string >();
+
+            // don't manage pages - the print handler will manage breaking up the lines into pages.
+            
+            // each line is in format <operator> tab <number>
+            // or <totallingOperator> tab tab tab <(sub)total>
+            foreach (string line in lstCalculations.Items)
+            {
+                // use stringbuilder for speed.
+                StringBuilder printLine = new StringBuilder("");
+                printLine.Append(line[0]);
+                printLine.Append('\t');
+
+                if (operatorFullTotal.Contains(line[0])
+                    || operatorSubTotal.Contains(line[0]))
+                {
+                    printLine.Append('\t');
+                    printLine.Append('\t');
+                    printLine.Append(line.Split(
+                        new string[] { indicatorTotalText },
+                        StringSplitOptions.None)[1].Trim());
+                }
+                else
+                {
+                    printLine.Append(line.Split(new char[] { ' ' })[1].Trim());
+                }
+
+                printLines.Add(printLine.ToString());
+            }
+
+            // 
+
+            // check if the preview form is disposed. if so, recreate it.
+            if (printPreviewDialogCalculation.IsDisposed)
+            {
+                printPreviewDialogCalculation = new PrintPreviewDialog();
+                printPreviewDialogCalculation.Document = printCalculation;
+            }
+
+            // put the preview dialog in front over the main form.
+            printPreviewDialogCalculation.Show();
+            printPreviewDialogCalculation.Left = this.Left + 15;
+            printPreviewDialogCalculation.Top = this.Top + 15;
+            printPreviewDialogCalculation.BringToFront();
         }
 
         /// <summary>
@@ -768,15 +822,71 @@ namespace AddStrip
         }
 
         /// <summary>
-        ///     helper method for tool tips.
+        ///     Helper method for tool tips.
         ///     places tooltip in same location each time.
         /// </summary>
-        /// <param name="message"></param>
+        /// <param name="message">the message to show in the tooltip.</param>
         private void showToolTipMessageNearNextCalculationTextbox(string message)
         {
             tip.Show(message, txtNextCalculation,
                     -10, 25, 3000);
         }
 
+        /// <summary>
+        ///     Print the calculations.
+        ///     A font and font size are assumed (see the class constants above).
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void printCalculation_PrintPage(object sender, PrintPageEventArgs e)
+        {
+            if (printLines != null && printLines.Count > 0 )
+            {
+                int LineHeight = PrintFont.Height;
+                int LinesPrinted = 0;
+                int LeftMargin = e.MarginBounds.Left;
+                // identify the maximum allowed length for lines
+                double MaxLineLength = e.MarginBounds.Width;
+                int TopMargin = e.MarginBounds.Top;
+                // identify the maximum allowed number of lines per page.
+                int MaxLinesToPrint = e.MarginBounds.Height / LineHeight;
+
+                Graphics g = e.Graphics;
+
+                while (LinesPrinted < MaxLinesToPrint 
+                    && printLines.Count > 0)
+                {
+                    double CurrentLineLength = g.MeasureString(printLines[0], PrintFont).Width;
+
+                    string line;
+
+                    if (CurrentLineLength > MaxLineLength)
+                    {
+                        line = printLines[0].Substring(0, 1).ToString();
+                        printLines[0] = '\t' + printLines[0].Substring(1).Trim();
+                    }
+                    else
+                    {
+                        line = printLines[0];
+                        printLines.RemoveAt(0);
+                    }
+
+                    g.DrawString(line, PrintFont, Brushes.Black,
+                        LeftMargin, TopMargin + (LinesPrinted * LineHeight));
+                    LinesPrinted++;
+
+                    
+                }
+
+                if (printLines.Count > 0)
+                {
+                    e.HasMorePages = true;
+                }
+                else
+                {
+                    e.HasMorePages = false;
+                }
+            }
+        }
     }
 }
