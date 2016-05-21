@@ -17,7 +17,7 @@ namespace AddStrip.Testing
         const string calculationFileExtension = "cal";
         const string calculationSaveDirectoryDefault = @"C:\temp";
 
-        FrmAddStrip readonly parentFrm;
+        FrmAddStrip parentFrm;
 
         public TestForm(FrmAddStrip frm)
         {
