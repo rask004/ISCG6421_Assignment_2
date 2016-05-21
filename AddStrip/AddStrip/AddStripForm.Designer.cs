@@ -1,6 +1,6 @@
 ﻿namespace AddStrip
 {
-    partial class frmAddStrip
+    partial class FrmAddStrip
     {
         /// <summary>
         /// Required designer variable.
@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmAddStrip));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmAddStrip));
             this.mnuAddStrip = new System.Windows.Forms.MenuStrip();
             this.tlstrpFileMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.tlstrpItemNew = new System.Windows.Forms.ToolStripMenuItem();
@@ -262,7 +262,7 @@
             this.printDialogCalculation.Document = this.printCalculation;
             this.printDialogCalculation.UseEXDialog = true;
             // 
-            // frmAddStrip
+            // FrmAddStrip
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -279,7 +279,7 @@
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(600, 400);
             this.MinimumSize = new System.Drawing.Size(600, 400);
-            this.Name = "frmAddStrip";
+            this.Name = "FrmAddStrip";
             this.Text = "AddStripForm";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AddStripForm_FormClosing);
             this.Load += new System.EventHandler(this.AddStripForm_Load);

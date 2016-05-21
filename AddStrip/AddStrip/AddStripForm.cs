@@ -1,32 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using AddStrip.Calculations;
-using System.Collections.ObjectModel;
 using System.IO;
-using System.Collections;
 using System.Drawing.Printing;
 
-//TODO: complete print menu item
-
-/// <summary>
-///     Addstrip Project (ISCG6421 Assignment 2)
-/// </summary>
 namespace AddStrip
 {
     /// <summary>
     ///     Main user form for the AddStrip application
     /// </summary>
-    public partial class frmAddStrip : Form
+    public partial class FrmAddStrip : Form
     {
         // Stores calc lines and manages displayed results.
-        private Calculation calculationManager;
+        private readonly Calculation calculationManager;
 
         // the last file that calculations were saved to.
         private string saveFilename;
@@ -38,61 +28,68 @@ namespace AddStrip
         private List<string> printLines;
 
         public static readonly Font PrintFont = new Font("Arial", 12);
+        public string MessageSuccessTitle;
 
         // file and directory constants
-        public const string calculationFileExtension = "cal";
-        public const string calculationSaveDirectoryDefault = @"C:\temp";
+        public const string CalculationFileExtension = "cal";
+        public const string CalculationFileExtensionExtended = 
+            "calculation files (*." + CalculationFileExtension + ") | *." + CalculationFileExtension;
+        public const string CalculationSaveDirectoryDefault = @"C:\temp";
 
         // file content constants
-        public const string fileLineSeparator = "\r\n";
-        public const string fileFieldHeader = "~AddStripCalculationLineFile";
+        public const string FileLineSeparator = "\r\n";
+        public const string FileFieldHeader = "~AddStripCalculationLineFile";
 
         // Local Constants (UI messages)
-        public const string messageOperandDescriptionWarning = "All Calculation line should have the form <operation>[+ or -]<numbers>." +
+        public const string MessageOperandDescriptionWarning = "All Calculation line should have the form <operation>[+ or -]<numbers>." +
             "\r\n" + @"E.G: +10, -+20, \5, -3, *-2, \+6";
-        public const string messageOperandAbsentWarning = "You did not enter a Calculation line in the calculation box.";
-        public const string messageOperandInvalidFormatWarning = "The operand could not be converted to a valid number";
-        public const string messageOperandInvalidTotalWarning = "There are no calculations to total or subtotal.";
-        public const string messageOperatorInvalidTerminationWarning = "Invalid Termination symbol. Must be one of: " + 
-            operatorTerminators;
-        public const string messageSaveChanges = "Do you wish to save your changes?";
-        public const string messageOpenFileNullError = "The specified file could not be opened.\r\n" + 
+        public const string MessageOperandAbsentWarning = "You did not enter a Calculation line in the calculation box.";
+        public const string MessageOperandInvalidFormatWarning = "The operand could not be converted to a valid number";
+        public const string MessageOperandInvalidTotalWarning = "There are no calculations to total or subtotal.";
+        public const string MessageOperatorInvalidTerminationWarning = "Invalid Termination symbol. Must be one of: " + 
+            OperatorTerminators;
+        public const string MessageSaveChanges = "Do you wish to save your changes?";
+        public const string MessageOpenFileNullError = "The specified file could not be opened.\r\n" + 
             "Check the file actually exists and is a calculation file.";
-        public const string messageFileParseError = "Could not parse the selected file." +
+        public const string MessageFileParseError = "Could not parse the selected file." +
                                 "\r\nCheck the file has the correct format." +
                                 "\r\nall files have the format:" +
-                                "\r\n" + fileFieldHeader +
+                                "\r\n" + FileFieldHeader +
                                 "\r\n" + "<calcLineString>" +
                                 "\r\n" + "...";
-        public const string messageSaveFileSuccess = "Your changes have successfully been saved.";
-        public const string messageReadCalcLinesDiscardedWarning =
+        public const string MessageSaveFileSuccess = "Your changes have successfully been saved.";
+        public const string MessageReadCalcLinesDiscardedWarning =
             "Calculation file was parsed but some Calculation Lines" +
             "\r\nCould not be parsed and will be missing. Please Check" +
             "\r\nyour loaded calculations. ";
-        public const string messageNoCalculationsToSaveNotice = 
+        public const string MessageNoCalculationsToSaveNotice = 
             "There are no Calculations to save.";
+        public const string MessageSaveChangesTitle = "Changes have been made";
+        public const string MessageErrorTitle = "Error";
 
         // Local Constants (valid calculation symbols)
         // More flexible than using a textbox mask - check specific chars, not fixed groups of chars.
-        public const string operatorTerminators = operatorCalculations + operatorTotals;
-        public const string operatorCalculations = "+-*/";
-        public const string operatorTotals = operatorSubTotal + operatorFullTotal;
-        public const string operatorSubTotal = "#";
-        public const string operatorFullTotal = "=";
-        public const string operandSigns = "+-";
-        public const string operandDigits = "0123456789";
+        public const string OperatorTerminators = OperatorCalculations + OperatorTotals;
+        public const string OperatorCalculations = "+-*/";
+        public const string OperatorTotals = OperatorSubTotal + OperatorFullTotal;
+        public const string OperatorSubTotal = "#";
+        public const string OperatorFullTotal = "=";
+        public const string OperandSigns = "+-";
+        public const string OperandDigits = "0123456789";
 
-        public const string indicatorTotalText = "<<";
+        public const string IndicatorTotalText = "<<";
+        public const string MessageNoticeTitle = "Notice";
 
         /// <summary>
         ///     Constructor
         /// </summary>
-        public frmAddStrip()
+        public FrmAddStrip()
         {
             InitializeComponent();
             saveFilename = null;
             changesHaveBeenMade = false;
             calculationManager = new Calculation(lstCalculations);
+            MessageSuccessTitle = "Success";
         }
 
         /// <summary>
@@ -115,8 +112,8 @@ namespace AddStrip
         private void AddStripForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (changesHaveBeenMade &&
-                MessageBox.Show(messageSaveChanges,
-                "Changes have been made", MessageBoxButtons.YesNo)
+                MessageBox.Show(MessageSaveChanges,
+                MessageSaveChangesTitle, MessageBoxButtons.YesNo)
                 == DialogResult.Yes)
             {
                 saveToolStripMenuItem_Click(sender, e);
@@ -132,8 +129,8 @@ namespace AddStrip
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (changesHaveBeenMade &&
-                MessageBox.Show(messageSaveChanges,
-                "Changes have been made", MessageBoxButtons.YesNo) 
+                MessageBox.Show(MessageSaveChanges,
+                MessageSaveChangesTitle, MessageBoxButtons.YesNo) 
                 == DialogResult.Yes)
             {
                 saveToolStripMenuItem_Click(sender, e);
@@ -155,18 +152,17 @@ namespace AddStrip
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (changesHaveBeenMade &&
-                MessageBox.Show(messageSaveChanges,
-                "Changes have been made", MessageBoxButtons.YesNo)
+                MessageBox.Show(MessageSaveChanges,
+                MessageSaveChangesTitle, MessageBoxButtons.YesNo)
                 == DialogResult.Yes)
             {
                 saveToolStripMenuItem_Click(sender, e);
             }
 
-            OpenFileDialog openDialog = new OpenFileDialog();
-            openDialog.Filter = "calculation files (*." + calculationFileExtension + ")" +
-                "|*." + calculationFileExtension;
+            var openDialog = new OpenFileDialog();
+            openDialog.Filter = CalculationFileExtensionExtended;
             openDialog.FilterIndex = 0;
-            openDialog.InitialDirectory = calculationSaveDirectoryDefault;
+            openDialog.InitialDirectory = CalculationSaveDirectoryDefault;
             openDialog.RestoreDirectory = false;
 
             if (openDialog.ShowDialog() == DialogResult.OK)
@@ -181,7 +177,7 @@ namespace AddStrip
                 {
                     if (ex is FormatException || ex is IOException)
                     {
-                        MessageBox.Show(messageFileParseError, "Error");
+                        MessageBox.Show(MessageFileParseError, MessageErrorTitle);
                         calculationManager.Clear();
                         txtSelectedCalculation.Text = "";
                         txtNextCalculation.Text = "";
@@ -207,7 +203,7 @@ namespace AddStrip
         {
             if (lstCalculations.Items.Count == 0)
             {
-                MessageBox.Show(messageNoCalculationsToSaveNotice, "Notice");
+                MessageBox.Show(MessageNoCalculationsToSaveNotice, MessageNoticeTitle);
                 return;
             }
 
@@ -223,14 +219,14 @@ namespace AddStrip
 
                     changesHaveBeenMade = false;
 
-                    MessageBox.Show(messageSaveFileSuccess, "Success");
+                    MessageBox.Show(MessageSaveFileSuccess, MessageSuccessTitle);
                 }
                 catch (Exception ex)
                 {
                     if (ex is NotSupportedException ||
                         ex is IOException)
                     {
-                        MessageBox.Show(messageFileParseError, "Error");
+                        MessageBox.Show(MessageFileParseError, MessageErrorTitle);
                     }
                     else
                     {
@@ -250,21 +246,20 @@ namespace AddStrip
         {
             if (lstCalculations.Items.Count == 0)
             {
-                MessageBox.Show(messageNoCalculationsToSaveNotice, "Notice");
+                MessageBox.Show(MessageNoCalculationsToSaveNotice, MessageNoticeTitle);
                 return;
             }
 
             SaveFileDialog saveAsDialog = new SaveFileDialog();
 
-            saveAsDialog.Filter = "calculation files (*." + calculationFileExtension + ")" +
-                "|*." + calculationFileExtension;
+            saveAsDialog.Filter = CalculationFileExtensionExtended;
             saveAsDialog.FilterIndex = 0;
-            saveAsDialog.InitialDirectory = calculationSaveDirectoryDefault;
+            saveAsDialog.InitialDirectory = CalculationSaveDirectoryDefault;
             saveAsDialog.RestoreDirectory = false;
 
             if (lstCalculations.Items.Count == 0)
             {
-                MessageBox.Show(messageNoCalculationsToSaveNotice, "Notice");
+                MessageBox.Show(MessageNoCalculationsToSaveNotice, MessageNoticeTitle);
             }
 
             if (saveAsDialog.ShowDialog() == DialogResult.OK)
@@ -276,14 +271,14 @@ namespace AddStrip
 
                     changesHaveBeenMade = false;
 
-                    MessageBox.Show(messageSaveFileSuccess, "Success");
+                    MessageBox.Show(MessageSaveFileSuccess, MessageSuccessTitle);
                 }
                 catch (Exception ex)
                 {
                     if (ex is NotSupportedException ||
                         ex is IOException)
                     {
-                        MessageBox.Show(messageFileParseError, "Error");
+                        MessageBox.Show(MessageFileParseError, MessageErrorTitle);
                     }
                     else
                     {
@@ -316,18 +311,18 @@ namespace AddStrip
                 printLine.Append(line[0]);
                 printLine.Append('\t');
 
-                if (operatorFullTotal.Contains(line[0])
-                    || operatorSubTotal.Contains(line[0]))
+                if (OperatorFullTotal.Contains(line[0])
+                    || OperatorSubTotal.Contains(line[0]))
                 {
                     printLine.Append('\t');
                     printLine.Append('\t');
                     printLine.Append(line.Split(
-                        new string[] { indicatorTotalText },
+                        new[] { IndicatorTotalText },
                         StringSplitOptions.None)[1].Trim());
                 }
                 else
                 {
-                    printLine.Append(line.Split(new char[] { ' ' })[1].Trim());
+                    printLine.Append(line.Split(new[] { ' ' })[1].Trim());
                 }
 
                 printLines.Add(printLine.ToString());
@@ -344,8 +339,8 @@ namespace AddStrip
 
             // put the preview dialog in front over the main form.
             printPreviewDialogCalculation.Show();
-            printPreviewDialogCalculation.Left = this.Left + 15;
-            printPreviewDialogCalculation.Top = this.Top + 15;
+            printPreviewDialogCalculation.Left = Left + 15;
+            printPreviewDialogCalculation.Top = Top + 15;
             printPreviewDialogCalculation.BringToFront();
         }
 
@@ -383,27 +378,27 @@ namespace AddStrip
             // helps manage copy and pastes as well as changes by keypress.
             if (txtNextCalculation.Text.Length > 0 )
             {
-                bool invalidCharsFound = false;
+                var invalidCharsFound = false;
 
                 // check for invalid chars first, remove all invalid chars, 
                 // if invalid char found, warn user, return
-                for (int i = 0; i < txtNextCalculation.Text.Length; i++)
+                foreach (var text in txtNextCalculation.Text)
                 {
-                    if (!operandDigits.Contains(txtNextCalculation.Text[i])
-                        && !operatorTerminators.Contains(txtNextCalculation.Text[i]))
+                    if (!OperandDigits.Contains(text)
+                        && !OperatorTerminators.Contains(text))
                     {
                         // don't store invalid chars.
                         invalidCharsFound = true;
                     }
                     else
                     {
-                        calctext += txtNextCalculation.Text[i].ToString();
+                        calctext += text.ToString();
                     }
                 }
 
                 if (invalidCharsFound)
                 {
-                    showToolTipMessageNearNextCalculationTextbox(
+                    ShowToolTipMessageNearNextCalculationTextbox(
                         "Only the characters \"0123456789#=+-*/\" are allowed.");
                 }
             }
@@ -423,13 +418,13 @@ namespace AddStrip
                 // when the next calculation would be the start of a new set of calculations...
                 if ((lstCalculations.Items.Count == 0 ||
                     calculationManager.Find(lstCalculations.Items.Count - 1).Op
-                    == Operator.total) && !operandDigits.Contains(calctext[0]))
+                    == Operator.total) && !OperandDigits.Contains(calctext[0]))
                 {
                     // ... first char is not digit, raise an Error
-                    showToolTipMessageNearNextCalculationTextbox(
+                    ShowToolTipMessageNearNextCalculationTextbox(
                         "This is the start of a new Calculation. \r\n" +
                         "Your first Calc Line must begin with a digit.\r\n" +
-                        "Format: <numbers><one of " + operatorTerminators + ">");
+                        "Format: <numbers><one of " + OperatorTerminators + ">");
                     calctext = "";
                     
                 }
@@ -437,7 +432,7 @@ namespace AddStrip
                 // Calc Line is for only a subtotal.
                 // if we are dealing with a starting calcline and it passed the above branch,
                 // it will skip this branch.
-                else if (operatorSubTotal.Equals(calctext[0].ToString()))
+                else if (OperatorSubTotal.Equals(calctext[0].ToString()))
                 {
                     // subtotal Calc Lines must have a previous calc line to subtotal from.
                     // cannot have multiple subtotal calclines in a row.
@@ -450,7 +445,7 @@ namespace AddStrip
                     == Operator.subtotal)
                     {
                         //... cannot have multiple subtotals in a row.
-                        showToolTipMessageNearNextCalculationTextbox(
+                        ShowToolTipMessageNearNextCalculationTextbox(
                             "The previous Calc Line is a subtotal. \r\n" +
                             "You cannot have multiple subtotals in a row.");
                     }
@@ -466,7 +461,7 @@ namespace AddStrip
                 // CalcLine is for a total
                 // if we are dealing with a starting calcline and it passed the above branch,
                 // it will skip this branch.
-                else if (operatorFullTotal.Equals(calctext[0].ToString()))
+                else if (OperatorFullTotal.Equals(calctext[0].ToString()))
                 {
                     // assumed this is not the start of a new set of calculations.
                     // as a starting calcline must lead with a digit, the previous branch
@@ -482,7 +477,7 @@ namespace AddStrip
                 // If was the first char of the first calcline in a new calculation,
                 //   or the first char of a following calcline and a subtotal char,
                 //   above branches would have already dealt with this.
-                else if (operatorTerminators.Contains(calctext[calctext.Length - 1]) && calctext.Length > 1)
+                else if (OperatorTerminators.Contains(calctext[calctext.Length - 1]) && calctext.Length > 1)
                 {
 
                     // break the text into the lead operator, and the string of numbers
@@ -493,7 +488,7 @@ namespace AddStrip
                     char terminatingChar = calctext[calctext.Length - 1];
 
                     // if no leading Operator, assume it is a plus.
-                    if (operandDigits.Contains(numString[0]))
+                    if (OperandDigits.Contains(numString[0]))
                     {
                         leadOperator = '+';
                     }
@@ -516,12 +511,12 @@ namespace AddStrip
                         // be changed to show only it
                         // otherwise if it is a total or subtotal, add a (sub)total calcline
                         // and clear the textbox
-                        if (terminatingChar.ToString() == operatorSubTotal)
+                        if (terminatingChar.ToString() == OperatorSubTotal)
                         {
                             calculationManager.Add(new CalcLine(Operator.subtotal));
                             calctext = "";
                         }
-                        else if (terminatingChar.ToString() == operatorFullTotal)
+                        else if (terminatingChar.ToString() == OperatorFullTotal)
                         {
                             calculationManager.Add(new CalcLine(Operator.total));
                             calctext = "";
@@ -535,10 +530,10 @@ namespace AddStrip
                     }
                     catch (FormatException)
                     {
-                        showToolTipMessageNearNextCalculationTextbox(
+                        ShowToolTipMessageNearNextCalculationTextbox(
                             "The Calculation noes not contain a valid number. \r\n" +
-                            "Format: [One of " + operatorCalculations + "]<digits><One of "
-                            + operatorTerminators + ">");
+                            "Format: [One of " + OperatorCalculations + "]<digits><One of "
+                            + OperatorTerminators + ">");
                     }
                 }
             }
@@ -557,28 +552,28 @@ namespace AddStrip
         ///     calculation line should be of form "operator operand".
         ///     e.g. * 10, / -5, + 20, - -4.
         /// </summary>
-        private bool selectedCalculationIsValid(string calculation)
+        public static bool SelectedCalculationIsValid(string calculation)
         {
-            bool isValid = false;
+            var isValid = false;
 
-            string[] calcParts = calculation.Split(new char[] { ' ' }, 2);
+            var calcParts = calculation.Split(new[] { ' ' }, 2);
 
             // calculation cannot be "" or null
-            if (calculation == null || calculation.Equals(""))
+            if (calculation.Equals(""))
             {
                 return false;
             }
 
             // calculation can be "#" or "="
             if (calcParts.Length == 1 
-                && operatorTotals.Contains(calcParts[0]))
+                && OperatorTotals.Contains(calcParts[0]))
             {
                 isValid = true;
             }
             
             // calculation can be "<operator> <digits>"
             if (calcParts.Length == 2
-                && operatorCalculations.Contains(calcParts[0]))
+                && OperatorCalculations.Contains(calcParts[0]))
             {
                 try
                 {
@@ -607,12 +602,12 @@ namespace AddStrip
         {
             if (lstCalculations.SelectedIndex == -1 )
             {
-                showToolTipMessageNearNextCalculationTextbox(
+                ShowToolTipMessageNearNextCalculationTextbox(
                     "Please first select a calculation line to Update.");
             }
-            else if (!selectedCalculationIsValid(txtSelectedCalculation.Text))
+            else if (!SelectedCalculationIsValid(txtSelectedCalculation.Text))
             {
-                showToolTipMessageNearNextCalculationTextbox(
+                ShowToolTipMessageNearNextCalculationTextbox(
                     "The calculation you entered was not valid.\r\n" +
                     "A valid calculation has the form \"<operator>  <digits>\"");
             }
@@ -622,16 +617,16 @@ namespace AddStrip
                 lstCalculations.SelectedIndex > 0 &&
                 calculationManager.Find(lstCalculations.SelectedIndex - 1).Op
                 == Operator.total)
-                && ( !operandSigns.Contains(txtSelectedCalculation.Text[0])
+                && ( !OperandSigns.Contains(txtSelectedCalculation.Text[0])
                 ))
             {
-                showToolTipMessageNearNextCalculationTextbox(
+                ShowToolTipMessageNearNextCalculationTextbox(
                     "The first calc line in any calculation must have a + or - operator.");
             }
 
             // cannot put a subtotal after another subtotal or before another subtotal
             else if (lstCalculations.Items.Count > 1 
-                && operatorSubTotal.Contains(txtSelectedCalculation.Text[0])
+                && OperatorSubTotal.Contains(txtSelectedCalculation.Text[0])
                 && ((lstCalculations.SelectedIndex - 1 > -1
                         && calculationManager.Find(lstCalculations.SelectedIndex - 1).Op
                         == Operator.subtotal)) 
@@ -640,20 +635,20 @@ namespace AddStrip
                         == Operator.subtotal)
                 )
             {
-                showToolTipMessageNearNextCalculationTextbox(
+                ShowToolTipMessageNearNextCalculationTextbox(
                     "You cannot place multiple subtotals in a row.\r\n" +
                     "Check your calculations and where you are placing the subtotal.");
             }
 
             // cannot place a total before another total.
             else if (lstCalculations.Items.Count > 1
-                && operatorFullTotal.Contains(txtSelectedCalculation.Text[0])
+                && OperatorFullTotal.Contains(txtSelectedCalculation.Text[0])
                 && ((lstCalculations.SelectedIndex + 1 < lstCalculations.Items.Count
                         && calculationManager.Find(lstCalculations.SelectedIndex + 1).Op
                         == Operator.total)
                 ))
             {
-                showToolTipMessageNearNextCalculationTextbox(
+                ShowToolTipMessageNearNextCalculationTextbox(
                     "You cannot place a total before an existing total.\r\n" +
                     "Check your calculations and where you are placing the subtotal.");
             }
@@ -677,12 +672,12 @@ namespace AddStrip
         {
             if (lstCalculations.Items.Count == 0)
             {
-                showToolTipMessageNearNextCalculationTextbox(
+                ShowToolTipMessageNearNextCalculationTextbox(
                     "There are no calculations to delete.\r\n");
             }
             else if (lstCalculations.SelectedIndex < 0)
             {
-                showToolTipMessageNearNextCalculationTextbox(
+                ShowToolTipMessageNearNextCalculationTextbox(
                     "Please first select a calculation line to Delete.");
             }
             else
@@ -704,17 +699,17 @@ namespace AddStrip
             
             if (lstCalculations.Items.Count == 0)
             {
-                showToolTipMessageNearNextCalculationTextbox(
+                ShowToolTipMessageNearNextCalculationTextbox(
                     "There are no calculations to insert above.\r\n");
             }
             else if (lstCalculations.SelectedIndex == -1)
             {
-                showToolTipMessageNearNextCalculationTextbox(
+                ShowToolTipMessageNearNextCalculationTextbox(
                     "Select a calculation to insert above.");
             }
-            else if (!selectedCalculationIsValid(txtSelectedCalculation.Text))
+            else if (!SelectedCalculationIsValid(txtSelectedCalculation.Text))
             {
-                showToolTipMessageNearNextCalculationTextbox(
+                ShowToolTipMessageNearNextCalculationTextbox(
                     "The calculation you entered was not valid.\r\n" +
                     "A valid calculation has the form \"<operator>  <digits>\"");
             }
@@ -725,16 +720,16 @@ namespace AddStrip
                 lstCalculations.SelectedIndex > 0 &&
                 calculationManager.Find(lstCalculations.SelectedIndex - 1).Op
                 == Operator.total)
-                && (!operandSigns.Contains(txtSelectedCalculation.Text[0])
+                && (!OperandSigns.Contains(txtSelectedCalculation.Text[0])
                 ))
             {
-                showToolTipMessageNearNextCalculationTextbox(
+                ShowToolTipMessageNearNextCalculationTextbox(
                     "The first calc line in any calculation must have a + or - operator.");
             }
 
             // cannot put a subtotal after another subtotal or before another subtotal
             else if (lstCalculations.Items.Count > 1
-                && operatorSubTotal.Contains(txtSelectedCalculation.Text[0])
+                && OperatorSubTotal.Contains(txtSelectedCalculation.Text[0])
                 && ((lstCalculations.SelectedIndex - 1 > -1
                         && calculationManager.Find(lstCalculations.SelectedIndex - 1).Op
                         == Operator.subtotal))
@@ -742,14 +737,14 @@ namespace AddStrip
                         == Operator.subtotal)
                 )
             {
-                showToolTipMessageNearNextCalculationTextbox(
+                ShowToolTipMessageNearNextCalculationTextbox(
                     "You cannot place multiple subtotals in a row.\r\n" +
                     "Check your calculations and where you are placing the subtotal.");
             }
 
             // cannot insert a total before another total or after another total.
             else if (lstCalculations.Items.Count > 1
-                && operatorFullTotal.Contains(txtSelectedCalculation.Text[0])
+                && OperatorFullTotal.Contains(txtSelectedCalculation.Text[0])
                 && ((lstCalculations.SelectedIndex - 1 > -1
                         && calculationManager.Find(lstCalculations.SelectedIndex - 1).Op
                         == Operator.total))
@@ -757,7 +752,7 @@ namespace AddStrip
                         == Operator.total)
                 )
             {
-                showToolTipMessageNearNextCalculationTextbox(
+                ShowToolTipMessageNearNextCalculationTextbox(
                     "You cannot place a total before or after an existing total.\r\n" +
                     "Check your calculations and where you are placing this total.");
             }
@@ -815,7 +810,7 @@ namespace AddStrip
         {
             if (e.KeyCode == Keys.Enter && txtNextCalculation.Text.Length == 0)
             {
-                showToolTipMessageNearNextCalculationTextbox(
+                ShowToolTipMessageNearNextCalculationTextbox(
                     "Please enter a calculation.");
 
             }
@@ -826,7 +821,7 @@ namespace AddStrip
         ///     places tooltip in same location each time.
         /// </summary>
         /// <param name="message">the message to show in the tooltip.</param>
-        private void showToolTipMessageNearNextCalculationTextbox(string message)
+        private void ShowToolTipMessageNearNextCalculationTextbox(string message)
         {
             tip.Show(message, txtNextCalculation,
                     -10, 25, 3000);
@@ -840,52 +835,54 @@ namespace AddStrip
         /// <param name="e"></param>
         private void printCalculation_PrintPage(object sender, PrintPageEventArgs e)
         {
-            if (printLines != null && printLines.Count > 0 )
+            if (printLines == null || printLines.Count == 0 )
             {
-                int LineHeight = PrintFont.Height;
-                int LinesPrinted = 0;
-                int LeftMargin = e.MarginBounds.Left;
-                // identify the maximum allowed length for lines
-                double MaxLineLength = e.MarginBounds.Width;
-                int TopMargin = e.MarginBounds.Top;
-                // identify the maximum allowed number of lines per page.
-                int MaxLinesToPrint = e.MarginBounds.Height / LineHeight;
+                return;
+            }
 
-                Graphics g = e.Graphics;
+            var lineHeight = PrintFont.Height;
+            var linesPrinted = 0;
+            var leftMargin = e.MarginBounds.Left;
+            // identify the maximum allowed length for lines
+            var maxLineLength = e.MarginBounds.Width;
+            var topMargin = e.MarginBounds.Top;
+            // identify the maximum allowed number of lines per page.
+            var maxLinesToPrint = e.MarginBounds.Height / lineHeight;
 
-                while (LinesPrinted < MaxLinesToPrint 
-                    && printLines.Count > 0)
+            var g = e.Graphics;
+
+            while (linesPrinted < maxLinesToPrint
+                && printLines.Count > 0)
+            {
+                double currentLineLength = g.MeasureString(printLines[0], PrintFont).Width;
+
+                string line;
+
+                if (currentLineLength > maxLineLength)
                 {
-                    double CurrentLineLength = g.MeasureString(printLines[0], PrintFont).Width;
-
-                    string line;
-
-                    if (CurrentLineLength > MaxLineLength)
-                    {
-                        line = printLines[0].Substring(0, 1).ToString();
-                        printLines[0] = '\t' + printLines[0].Substring(1).Trim();
-                    }
-                    else
-                    {
-                        line = printLines[0];
-                        printLines.RemoveAt(0);
-                    }
-
-                    g.DrawString(line, PrintFont, Brushes.Black,
-                        LeftMargin, TopMargin + (LinesPrinted * LineHeight));
-                    LinesPrinted++;
-
-                    
-                }
-
-                if (printLines.Count > 0)
-                {
-                    e.HasMorePages = true;
+                    line = printLines[0].Substring(0, 1);
+                    printLines[0] = '\t' + printLines[0].Substring(1).Trim();
                 }
                 else
                 {
-                    e.HasMorePages = false;
+                    line = printLines[0];
+                    printLines.RemoveAt(0);
                 }
+
+                g.DrawString(line, PrintFont, Brushes.Black,
+                    leftMargin, topMargin + (linesPrinted * lineHeight));
+                linesPrinted++;
+
+
+            }
+
+            if (printLines.Count > 0)
+            {
+                e.HasMorePages = true;
+            }
+            else
+            {
+                e.HasMorePages = false;
             }
         }
     }

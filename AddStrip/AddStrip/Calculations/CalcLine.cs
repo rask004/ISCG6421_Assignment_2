@@ -1,9 +1,5 @@
 using System;
 
-/// <summary>
-///     Addstrip Project (ISCG6421 Assignment 2)
-///     Sub space for calculation related objects.
-/// </summary>
 namespace AddStrip.Calculations
 {
 	public enum Operator {plus,minus,times,divide,subtotal,total, error};

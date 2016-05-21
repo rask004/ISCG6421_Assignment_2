@@ -1,19 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-/// <summary>
-///     Addstrip Project (ISCG6421 Assignment 2)
-///     Sub space for calculation related objects.
-/// </summary>
-namespace AddStrip.Calculations
+﻿namespace AddStrip.Calculations
 {
     /// <summary>
     ///     Interface for the Calculation Class.
     /// </summary>
-    interface CalculationContract
+    internal interface ICalculationContract
     {
         /// <summary>
         ///     Add a calc line object.
