@@ -168,7 +168,7 @@ namespace AddStrip.Calculations
             foreach (var fileString in fileStrings)
             {
 
-                if (fileString.Length > 0)
+                if (fileString.Length == 0)
                 {
                     continue;
                 }

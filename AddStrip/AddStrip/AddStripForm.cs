@@ -8,6 +8,9 @@ using AddStrip.Calculations;
 using System.IO;
 using System.Drawing.Printing;
 
+// TODO: remove calculationcontract
+// TODO: check all commenting and remove commented-out code
+
 namespace AddStrip
 {
     /// <summary>
