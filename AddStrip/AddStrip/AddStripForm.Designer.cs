@@ -1,6 +1,6 @@
 ﻿namespace AddStrip
 {
-    partial class frmAddStrip
+    partial class FrmAddStrip
     {
         /// <summary>
         /// Required designer variable.
@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmAddStrip));
             this.mnuAddStrip = new System.Windows.Forms.MenuStrip();
             this.tlstrpFileMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.tlstrpItemNew = new System.Windows.Forms.ToolStripMenuItem();
@@ -47,10 +48,10 @@
             this.btnDeleteCalculation = new System.Windows.Forms.Button();
             this.btnUpdateCalculation = new System.Windows.Forms.Button();
             this.txtSelectedCalculation = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
             this.tip = new System.Windows.Forms.ToolTip(this.components);
             this.txtNextCalculation = new System.Windows.Forms.TextBox();
+            this.printCalculation = new System.Drawing.Printing.PrintDocument();
+            this.printPreviewDialogCalculation = new System.Windows.Forms.PrintPreviewDialog();
             this.mnuAddStrip.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -213,22 +214,6 @@
             this.txtSelectedCalculation.Size = new System.Drawing.Size(183, 22);
             this.txtSelectedCalculation.TabIndex = 6;
             // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(273, 120);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(0, 17);
-            this.label3.TabIndex = 6;
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(400, 120);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(0, 17);
-            this.label4.TabIndex = 7;
-            // 
             // txtNextCalculation
             // 
             this.txtNextCalculation.Location = new System.Drawing.Point(273, 73);
@@ -238,13 +223,26 @@
             this.txtNextCalculation.TextChanged += new System.EventHandler(this.txtNextCalculation_TextChanged);
             this.txtNextCalculation.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtNextCalculation_KeyDown);
             // 
-            // frmAddStrip
+            // printCalculation
+            // 
+            this.printCalculation.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(this.printCalculation_PrintPage);
+            // 
+            // printPreviewDialogCalculation
+            // 
+            this.printPreviewDialogCalculation.AutoScrollMargin = new System.Drawing.Size(0, 0);
+            this.printPreviewDialogCalculation.AutoScrollMinSize = new System.Drawing.Size(0, 0);
+            this.printPreviewDialogCalculation.ClientSize = new System.Drawing.Size(400, 300);
+            this.printPreviewDialogCalculation.Document = this.printCalculation;
+            this.printPreviewDialogCalculation.Enabled = true;
+            this.printPreviewDialogCalculation.Icon = ((System.Drawing.Icon)(resources.GetObject("printPreviewDialogCalculation.Icon")));
+            this.printPreviewDialogCalculation.Name = "printPreviewDialogCalculation";
+            this.printPreviewDialogCalculation.Visible = false;
+            // 
+            // FrmAddStrip
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(582, 353);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.label3);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.txtNextCalculation);
@@ -255,7 +253,7 @@
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(600, 400);
             this.MinimumSize = new System.Drawing.Size(600, 400);
-            this.Name = "frmAddStrip";
+            this.Name = "FrmAddStrip";
             this.Text = "AddStripForm";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AddStripForm_FormClosing);
             this.Load += new System.EventHandler(this.AddStripForm_Load);
@@ -287,10 +285,10 @@
         private System.Windows.Forms.Button btnInsertCalculation;
         private System.Windows.Forms.Button btnDeleteCalculation;
         private System.Windows.Forms.Button btnUpdateCalculation;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label4;
         public System.Windows.Forms.TextBox txtSelectedCalculation;
         public System.Windows.Forms.TextBox txtNextCalculation;
         public System.Windows.Forms.ToolTip tip;
+        private System.Drawing.Printing.PrintDocument printCalculation;
+        private System.Windows.Forms.PrintPreviewDialog printPreviewDialogCalculation;
     }
 }

@@ -171,6 +171,46 @@ namespace AddStrip {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Point similar to {X=239,Y=17}.
+        /// </summary>
+        public static System.Drawing.Point printCalculation_TrayLocation {
+            get {
+                object obj = ResourceManager.GetObject("printCalculation.TrayLocation", resourceCulture);
+                return ((System.Drawing.Point)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Point similar to {X=664,Y=17}.
+        /// </summary>
+        public static System.Drawing.Point printDialogCalculation_TrayLocation {
+            get {
+                object obj = ResourceManager.GetObject("printDialogCalculation.TrayLocation", resourceCulture);
+                return ((System.Drawing.Point)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        public static System.Drawing.Icon printPreviewDialogCalculation_Icon {
+            get {
+                object obj = ResourceManager.GetObject("printPreviewDialogCalculation.Icon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Point similar to {X=403,Y=17}.
+        /// </summary>
+        public static System.Drawing.Point printPreviewDialogCalculation_TrayLocation {
+            get {
+                object obj = ResourceManager.GetObject("printPreviewDialogCalculation.TrayLocation", resourceCulture);
+                return ((System.Drawing.Point)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Point similar to {X=164,Y=17}.
         /// </summary>
         public static System.Drawing.Point tip_TrayLocation {
