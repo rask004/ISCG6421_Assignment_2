@@ -22,7 +22,7 @@ namespace AddStrip
         private string saveFilename;
 
         // keep track of changes.
-        private Boolean changesHaveBeenMade;
+        private bool changesHaveBeenMade;
 
         // store string data for printing
         private List<string> printLines;
@@ -673,15 +673,48 @@ namespace AddStrip
             if (lstCalculations.Items.Count == 0)
             {
                 ShowToolTipMessageNearNextCalculationTextbox(
-                    "There are no calculations to delete.\r\n");
+                    "There are no calculations to delete.");
             }
             else if (lstCalculations.SelectedIndex < 0)
             {
                 ShowToolTipMessageNearNextCalculationTextbox(
-                    "Please first select a calculation line to Delete.");
+                    "Please first select a calculation line to delete.");
             }
+            else if (lstCalculations.SelectedIndex > 0
+                     && calculationManager.Find(lstCalculations.SelectedIndex - 1).Op ==
+                     Operator.total
+                     && lstCalculations.SelectedIndex < lstCalculations.Items.Count
+                     && (calculationManager.Find(lstCalculations.SelectedIndex + 1).Op ==
+                         Operator.subtotal || calculationManager.Find(
+                         lstCalculations.SelectedIndex + 1).Op == Operator.total)
+                    )
+            {
+                ShowToolTipMessageNearNextCalculationTextbox(
+                    "Cannot delete: A total or subtotal Calc Line is \r\nnot permitted after a total Calc Line");
+            }
+            else if (lstCalculations.SelectedIndex > 0
+                     && calculationManager.Find(lstCalculations.SelectedIndex - 1).Op ==
+                     Operator.subtotal
+                     && lstCalculations.SelectedIndex < lstCalculations.Items.Count
+                     && calculationManager.Find(lstCalculations.SelectedIndex + 1).Op ==
+                     Operator.subtotal
+                    )
+            {
+                ShowToolTipMessageNearNextCalculationTextbox(
+                    "Cannot delete: A subtotal Calc Line is \r\nnot permitted after a subtotal Calc Line");
+            }
+
             else
             {
+                if (lstCalculations.SelectedIndex > 0 
+                    && calculationManager.Find(lstCalculations.SelectedIndex - 1).Op ==
+                    Operator.total)
+                {
+                    // all calc lines at the start of a set of calculations must begin with a plus.
+                    calculationManager.Find(lstCalculations.SelectedIndex - 1).Op = Operator.plus;
+                }
+
+
                 calculationManager.Delete(lstCalculations.SelectedIndex);
                 txtSelectedCalculation.Text = "";
             }
