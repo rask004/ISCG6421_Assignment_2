@@ -14,12 +14,12 @@ namespace AddStrip.Testing
 {
     public partial class TestForm : Form
     {
-        const string calculationFileExtension = "cal";
-        const string calculationSaveDirectoryDefault = @"C:\temp";
+        private const string CalculationFileExtension = "cal";
+        private const string CalculationSaveDirectoryDefault = @"C:\temp";
 
-        frmAddStrip parentFrm;
+        FrmAddStrip parentFrm;
 
-        public TestForm(frmAddStrip frm)
+        public TestForm(FrmAddStrip frm)
         {
             InitializeComponent();
             parentFrm = frm;
@@ -56,10 +56,10 @@ namespace AddStrip.Testing
             Stream myStream;
             SaveFileDialog saveAsDialog = new SaveFileDialog();
 
-            saveAsDialog.Filter = "calculation files (*."+ calculationFileExtension + ")" +
-                "|*." + calculationFileExtension;
+            saveAsDialog.Filter = "calculation files (*."+ CalculationFileExtension + ")" +
+                "|*." + CalculationFileExtension;
             saveAsDialog.FilterIndex = 0;
-            saveAsDialog.InitialDirectory = calculationSaveDirectoryDefault;
+            saveAsDialog.InitialDirectory = CalculationSaveDirectoryDefault;
             saveAsDialog.RestoreDirectory = false;
 
             if (saveAsDialog.ShowDialog() == DialogResult.OK)
@@ -76,9 +76,9 @@ namespace AddStrip.Testing
         {
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
 
-            openFileDialog1.InitialDirectory = calculationSaveDirectoryDefault;
-            openFileDialog1.Filter = "calculation files (*." + calculationFileExtension + ")" +
-                "|*." + calculationFileExtension;
+            openFileDialog1.InitialDirectory = CalculationSaveDirectoryDefault;
+            openFileDialog1.Filter = "calculation files (*." + CalculationFileExtension + ")" +
+                "|*." + CalculationFileExtension;
             openFileDialog1.FilterIndex = 0;
             openFileDialog1.RestoreDirectory = false;
 
