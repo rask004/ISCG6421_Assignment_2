@@ -57,6 +57,9 @@ namespace AddStrip
                                 "\r\n" + FileFieldHeader +
                                 "\r\n" + "<calcLineString>" +
                                 "\r\n" + "...";
+        public const string MessageEditingConsecutiveTotalsError = "You cannot place a total before or after an existing total.\r\n" +
+                                                                   "Check your calculations and where you are placing this total.";
+
         public const string MessageSaveFileSuccess = "Your changes have successfully been saved.";
         public const string MessageReadCalcLinesDiscardedWarning =
             "Calculation file was parsed but some Calculation Lines" +
@@ -86,9 +89,7 @@ namespace AddStrip
 
         public const string IndicatorTotalText = "<<";
 
-        public const string MessageEditingConsecutiveTotalsError = "You cannot place a total before or after an existing total.\r\n" +
-                                                                   "Check your calculations and where you are placing this total.";
-
+        
 
         /// <summary>
         ///     Constructor
@@ -454,8 +455,7 @@ namespace AddStrip
                     {
                         //... cannot have multiple subtotals in a row.
                         ShowToolTipMessageNearNextCalculationTextbox(
-                            "The previous Calc Line is a subtotal. \r\n" +
-                            "You cannot have multiple subtotals in a row.");
+                            MessageEditingPlaceConsecutiveSubtotalsError);
                     }
                     else
                     {
@@ -893,6 +893,8 @@ namespace AddStrip
 
                 string line;
 
+                // if line is too long, break it apart and print over multiple lines.
+                // do the line break with respect to max lines per page.
                 if (currentLineLength > maxLineLength)
                 {
                     line = printLines[0].Substring(0, 1);
