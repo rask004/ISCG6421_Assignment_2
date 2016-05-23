@@ -113,26 +113,6 @@ namespace AddStrip {
         /// <summary>
         ///   Looks up a localized resource of type System.Boolean similar to True.
         /// </summary>
-        public static bool label3_Locked {
-            get {
-                object obj = ResourceManager.GetObject("label3.Locked", resourceCulture);
-                return ((bool)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Boolean similar to True.
-        /// </summary>
-        public static bool label4_Locked {
-            get {
-                object obj = ResourceManager.GetObject("label4.Locked", resourceCulture);
-                return ((bool)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Boolean similar to True.
-        /// </summary>
         public static bool lstCalculations_Locked {
             get {
                 object obj = ResourceManager.GetObject("lstCalculations.Locked", resourceCulture);
@@ -176,16 +156,6 @@ namespace AddStrip {
         public static System.Drawing.Point printCalculation_TrayLocation {
             get {
                 object obj = ResourceManager.GetObject("printCalculation.TrayLocation", resourceCulture);
-                return ((System.Drawing.Point)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Point similar to {X=664,Y=17}.
-        /// </summary>
-        public static System.Drawing.Point printDialogCalculation_TrayLocation {
-            get {
-                object obj = ResourceManager.GetObject("printDialogCalculation.TrayLocation", resourceCulture);
                 return ((System.Drawing.Point)(obj));
             }
         }

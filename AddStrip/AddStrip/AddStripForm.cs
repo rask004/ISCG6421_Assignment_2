@@ -8,6 +8,9 @@ using AddStrip.Calculations;
 using System.IO;
 using System.Drawing.Printing;
 
+// TODO: remove calculationcontract
+// TODO: check all commenting and remove commented-out code
+
 namespace AddStrip
 {
     /// <summary>
@@ -41,14 +44,19 @@ namespace AddStrip
         public const string FileFieldHeader = "~AddStripCalculationLineFile";
 
         // Local Constants (UI messages)
-        public const string MessageOperandDescriptionWarning = "All Calculation line should have the form <operation>[+ or -]<numbers>." +
-            "\r\n" + @"E.G: +10, -+20, \5, -3, *-2, \+6";
-        public const string MessageOperandAbsentWarning = "You did not enter a Calculation line in the calculation box.";
-        public const string MessageOperandInvalidFormatWarning = "The operand could not be converted to a valid number";
         public const string MessageOperandInvalidTotalWarning = "There are no calculations to total or subtotal.";
         public const string MessageOperatorInvalidTerminationWarning = "Invalid Termination symbol. Must be one of: " + 
             OperatorTerminators;
         public const string MessageSaveChanges = "Do you wish to save your changes?";
+        public const string MessageInvalidNumberError = "The Calculation noes not contain a valid number. \r\n" +
+                            "Format: [One of " + OperatorCalculations + "]<digits><One of "
+                            + OperatorTerminators + ">";
+        public const string MessageNewCalculationStartError = "This is the start of a new Calculation. \r\n" +
+                        "Your first Calc Line must begin with a digit.\r\n" +
+                        "Format: <numbers><one of " + OperatorTerminators + ">";
+        public const string MessageRecurringSubtotalError =
+                            "The previous Calc Line is a subtotal. \r\n" +
+                            "You cannot have multiple subtotals in a row.";
         public const string MessageOpenFileNullError = "The specified file could not be opened.\r\n" + 
             "Check the file actually exists and is a calculation file.";
         public const string MessageFileParseError = "Could not parse the selected file." +
@@ -421,10 +429,7 @@ namespace AddStrip
                     == Operator.total) && !OperandDigits.Contains(calctext[0]))
                 {
                     // ... first char is not digit, raise an Error
-                    ShowToolTipMessageNearNextCalculationTextbox(
-                        "This is the start of a new Calculation. \r\n" +
-                        "Your first Calc Line must begin with a digit.\r\n" +
-                        "Format: <numbers><one of " + OperatorTerminators + ">");
+                    ShowToolTipMessageNearNextCalculationTextbox(MessageNewCalculationStartError);
                     calctext = "";
                     
                 }
@@ -445,9 +450,7 @@ namespace AddStrip
                     == Operator.subtotal)
                     {
                         //... cannot have multiple subtotals in a row.
-                        ShowToolTipMessageNearNextCalculationTextbox(
-                            "The previous Calc Line is a subtotal. \r\n" +
-                            "You cannot have multiple subtotals in a row.");
+                        ShowToolTipMessageNearNextCalculationTextbox(MessageRecurringSubtotalError);
                     }
                     else
                     {
@@ -530,10 +533,7 @@ namespace AddStrip
                     }
                     catch (FormatException)
                     {
-                        ShowToolTipMessageNearNextCalculationTextbox(
-                            "The Calculation noes not contain a valid number. \r\n" +
-                            "Format: [One of " + OperatorCalculations + "]<digits><One of "
-                            + OperatorTerminators + ">");
+                        ShowToolTipMessageNearNextCalculationTextbox(MessageInvalidNumberError);
                     }
                 }
             }
@@ -891,6 +891,8 @@ namespace AddStrip
 
                 string line;
 
+                // if line is too long, break it apart and print over multiple lines.
+                // do the line break with respect to max lines per page.
                 if (currentLineLength > maxLineLength)
                 {
                     line = printLines[0].Substring(0, 1);
