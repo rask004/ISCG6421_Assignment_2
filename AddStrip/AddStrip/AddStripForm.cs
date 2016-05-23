@@ -53,7 +53,7 @@ namespace AddStrip
                             + OperatorTerminators + ">";
         public const string MessageNewCalculationStartError = "This is the start of a new Calculation. \r\n" +
                         "Your first Calc Line must begin with a digit.\r\n" +
-                        "Format: <numbers><one of " + OperatorCalculations + ">";
+                        "Format: <numbers><one of " + OperatorTerminators + ">";
         public const string MessageRecurringSubtotalError =
                             "The previous Calc Line is a subtotal. \r\n" +
                             "You cannot have multiple subtotals in a row.";
