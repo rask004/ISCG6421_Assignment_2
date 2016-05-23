@@ -10,13 +10,21 @@ namespace AddStrip.Calculations
     ///     Calculation class for Assignment 2 (see namespace summary).
     ///     Uses required methods in the ICalculationContract object.
     /// </summary>
-    class Calculation: ICalculationContract
+    class Calculation
     {
         // The listbox to show calculation lines in
         private readonly ListBox lstDisplay;
 
         // The list of calculation lines made.
         private readonly ArrayList theCalcs;
+
+        public int Count
+        {
+            get
+            {
+                return theCalcs.Count;
+            }
+        }
 
         // file content constants
         public const string FileLineSeparator = "\r\n";
