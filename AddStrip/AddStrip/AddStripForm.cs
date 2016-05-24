@@ -538,10 +538,27 @@ namespace AddStrip
                     }
                     catch (FormatException)
                     {
-                        ShowToolTipMessageNearNextCalculationTextbox(
+                        if (calculationManager.Count == 0 ||
+                            calculationManager.Find(calculationManager.Count - 1).Op
+                            == Operator.total)
+                        {
+                            ShowToolTipMessageNearNextCalculationTextbox(
+                            "The Calculation noes not contain a valid number. \r\n" +
+                            "Format: [One of " + OperandSigns +
+                            "]<digits><One of " + OperatorTerminators + ">");
+                        }
+                        else
+                        {
+                            ShowToolTipMessageNearNextCalculationTextbox(
                             "The Calculation noes not contain a valid number. \r\n" +
                             "Format: [One of " + OperatorCalculations + "]<digits><One of "
                             + OperatorTerminators + ">");
+                        }
+                        
+                        if (calctext.Length > 0)
+                        {
+                            calctext = calctext[0].ToString();
+                        }
                     }
                 }
             }
