@@ -8,9 +8,6 @@ using AddStrip.Calculations;
 using System.IO;
 using System.Drawing.Printing;
 
-// TODO: remove calculationcontract
-// TODO: check all commenting and remove commented-out code
-
 namespace AddStrip
 {
     /// <summary>
@@ -44,19 +41,14 @@ namespace AddStrip
         public const string FileFieldHeader = "~AddStripCalculationLineFile";
 
         // Local Constants (UI messages)
+        public const string MessageOperandDescriptionWarning = "All Calculation line should have the form <operation>[+ or -]<numbers>." +
+            "\r\n" + @"E.G: +10, -+20, \5, -3, *-2, \+6";
+        public const string MessageOperandAbsentWarning = "You did not enter a Calculation line in the calculation box.";
+        public const string MessageOperandInvalidFormatWarning = "The operand could not be converted to a valid number";
         public const string MessageOperandInvalidTotalWarning = "There are no calculations to total or subtotal.";
         public const string MessageOperatorInvalidTerminationWarning = "Invalid Termination symbol. Must be one of: " + 
             OperatorTerminators;
         public const string MessageSaveChanges = "Do you wish to save your changes?";
-        public const string MessageInvalidNumberError = "The Calculation noes not contain a valid number. \r\n" +
-                            "Format: [One of " + OperatorCalculations + "]<digits><One of "
-                            + OperatorTerminators + ">";
-        public const string MessageNewCalculationStartError = "This is the start of a new Calculation. \r\n" +
-                        "Your first Calc Line must begin with a digit.\r\n" +
-                        "Format: <numbers><one of " + OperatorTerminators + ">";
-        public const string MessageRecurringSubtotalError =
-                            "The previous Calc Line is a subtotal. \r\n" +
-                            "You cannot have multiple subtotals in a row.";
         public const string MessageOpenFileNullError = "The specified file could not be opened.\r\n" + 
             "Check the file actually exists and is a calculation file.";
         public const string MessageFileParseError = "Could not parse the selected file." +
@@ -65,6 +57,9 @@ namespace AddStrip
                                 "\r\n" + FileFieldHeader +
                                 "\r\n" + "<calcLineString>" +
                                 "\r\n" + "...";
+        public const string MessageEditingConsecutiveTotalsError = "You cannot place a total before or after an existing total.\r\n" +
+                                                                   "Check your calculations and where you are placing this total.";
+
         public const string MessageSaveFileSuccess = "Your changes have successfully been saved.";
         public const string MessageReadCalcLinesDiscardedWarning =
             "Calculation file was parsed but some Calculation Lines" +
@@ -72,7 +67,14 @@ namespace AddStrip
             "\r\nyour loaded calculations. ";
         public const string MessageNoCalculationsToSaveNotice = 
             "There are no Calculations to save.";
+        public const string MessageEditingInvalidCalculationEnteredError = "The calculation you entered was not valid.\r\n" +
+                                                                      "A valid calculation has the form \"<operator>  <digits>\"";
+        public const string MessageInitialCalcLineMissingSignError = "The first calc line in any calculation must have a + or - operator.";
+        public const string MessageEditingPlaceConsecutiveSubtotalsError = "You cannot place multiple subtotals in a row.\r\n" +
+                                                                           "Check your calculations and where you are placing the subtotal.";
+
         public const string MessageSaveChangesTitle = "Changes have been made";
+        public const string MessageNoticeTitle = "Notice";
         public const string MessageErrorTitle = "Error";
 
         // Local Constants (valid calculation symbols)
@@ -86,7 +88,8 @@ namespace AddStrip
         public const string OperandDigits = "0123456789";
 
         public const string IndicatorTotalText = "<<";
-        public const string MessageNoticeTitle = "Notice";
+
+        
 
         /// <summary>
         ///     Constructor
@@ -209,7 +212,7 @@ namespace AddStrip
         /// <param name="e"></param>
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (lstCalculations.Items.Count == 0)
+            if (calculationManager.Count == 0)
             {
                 MessageBox.Show(MessageNoCalculationsToSaveNotice, MessageNoticeTitle);
                 return;
@@ -252,7 +255,7 @@ namespace AddStrip
         /// <param name="e"></param>
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (lstCalculations.Items.Count == 0)
+            if (calculationManager.Count == 0)
             {
                 MessageBox.Show(MessageNoCalculationsToSaveNotice, MessageNoticeTitle);
                 return;
@@ -264,11 +267,6 @@ namespace AddStrip
             saveAsDialog.FilterIndex = 0;
             saveAsDialog.InitialDirectory = CalculationSaveDirectoryDefault;
             saveAsDialog.RestoreDirectory = false;
-
-            if (lstCalculations.Items.Count == 0)
-            {
-                MessageBox.Show(MessageNoCalculationsToSaveNotice, MessageNoticeTitle);
-            }
 
             if (saveAsDialog.ShowDialog() == DialogResult.OK)
             {
@@ -423,18 +421,24 @@ namespace AddStrip
             else
             {
                 // this is start of a new calculation.
+
                 // when the next calculation would be the start of a new set of calculations...
-                if ((lstCalculations.Items.Count == 0 ||
-                    calculationManager.Find(lstCalculations.Items.Count - 1).Op
-                    == Operator.total) && !OperandDigits.Contains(calctext[0]))
+                if ((calculationManager.Count == 0 ||
+                    calculationManager.Find(calculationManager.Count - 1).Op
+                    == Operator.total) && !OperandDigits.Contains(calctext[0])
+                    && !OperandSigns.Contains(calctext[0]))
                 {
-                    // ... first char is not digit, raise an Error
-                    ShowToolTipMessageNearNextCalculationTextbox(MessageNewCalculationStartError);
+                    // ... first char is not digit or sign, raise an Error
+                    ShowToolTipMessageNearNextCalculationTextbox(
+                        "This is the start of a new Calculation. \r\n" +
+                        "Your first Calc Line must begin with a digit or a sign symbol.\r\n" +
+                        "Format: [+ or -]<numbers><one of " + OperatorTerminators + ">");
                     calctext = "";
                     
                 }
 
                 // Calc Line is for only a subtotal.
+
                 // if we are dealing with a starting calcline and it passed the above branch,
                 // it will skip this branch.
                 else if (OperatorSubTotal.Equals(calctext[0].ToString()))
@@ -450,7 +454,8 @@ namespace AddStrip
                     == Operator.subtotal)
                     {
                         //... cannot have multiple subtotals in a row.
-                        ShowToolTipMessageNearNextCalculationTextbox(MessageRecurringSubtotalError);
+                        ShowToolTipMessageNearNextCalculationTextbox(
+                            MessageEditingPlaceConsecutiveSubtotalsError);
                     }
                     else
                     {
@@ -533,7 +538,27 @@ namespace AddStrip
                     }
                     catch (FormatException)
                     {
-                        ShowToolTipMessageNearNextCalculationTextbox(MessageInvalidNumberError);
+                        if (calculationManager.Count == 0 ||
+                            calculationManager.Find(calculationManager.Count - 1).Op
+                            == Operator.total)
+                        {
+                            ShowToolTipMessageNearNextCalculationTextbox(
+                            "The Calculation noes not contain a valid number. \r\n" +
+                            "Format: [One of " + OperandSigns +
+                            "]<digits><One of " + OperatorTerminators + ">");
+                        }
+                        else
+                        {
+                            ShowToolTipMessageNearNextCalculationTextbox(
+                            "The Calculation noes not contain a valid number. \r\n" +
+                            "Format: [One of " + OperatorCalculations + "]<digits><One of "
+                            + OperatorTerminators + ">");
+                        }
+                        
+                        if (calctext.Length > 0)
+                        {
+                            calctext = calctext[0].ToString();
+                        }
                     }
                 }
             }
@@ -608,12 +633,11 @@ namespace AddStrip
             else if (!SelectedCalculationIsValid(txtSelectedCalculation.Text))
             {
                 ShowToolTipMessageNearNextCalculationTextbox(
-                    "The calculation you entered was not valid.\r\n" +
-                    "A valid calculation has the form \"<operator>  <digits>\"");
+                    MessageEditingInvalidCalculationEnteredError);
             }
             // first calcline in any set of calculations must start with - or +
             else if ((lstCalculations.SelectedIndex == 0
-                || lstCalculations.Items.Count > 1 &&
+                || calculationManager.Count > 1 &&
                 lstCalculations.SelectedIndex > 0 &&
                 calculationManager.Find(lstCalculations.SelectedIndex - 1).Op
                 == Operator.total)
@@ -621,11 +645,11 @@ namespace AddStrip
                 ))
             {
                 ShowToolTipMessageNearNextCalculationTextbox(
-                    "The first calc line in any calculation must have a + or - operator.");
+                    MessageInitialCalcLineMissingSignError);
             }
 
             // cannot put a subtotal after another subtotal or before another subtotal
-            else if (lstCalculations.Items.Count > 1 
+            else if (calculationManager.Count > 1 
                 && OperatorSubTotal.Contains(txtSelectedCalculation.Text[0])
                 && ((lstCalculations.SelectedIndex - 1 > -1
                         && calculationManager.Find(lstCalculations.SelectedIndex - 1).Op
@@ -636,12 +660,11 @@ namespace AddStrip
                 )
             {
                 ShowToolTipMessageNearNextCalculationTextbox(
-                    "You cannot place multiple subtotals in a row.\r\n" +
-                    "Check your calculations and where you are placing the subtotal.");
+                    MessageEditingPlaceConsecutiveSubtotalsError);
             }
 
             // cannot place a total before another total.
-            else if (lstCalculations.Items.Count > 1
+            else if (calculationManager.Count > 1
                 && OperatorFullTotal.Contains(txtSelectedCalculation.Text[0])
                 && ((lstCalculations.SelectedIndex + 1 < lstCalculations.Items.Count
                         && calculationManager.Find(lstCalculations.SelectedIndex + 1).Op
@@ -649,8 +672,7 @@ namespace AddStrip
                 ))
             {
                 ShowToolTipMessageNearNextCalculationTextbox(
-                    "You cannot place a total before an existing total.\r\n" +
-                    "Check your calculations and where you are placing the subtotal.");
+                    MessageEditingConsecutiveTotalsError);
             }
 
             else
@@ -670,7 +692,7 @@ namespace AddStrip
         /// <param name="e"></param>
         private void btnDeleteCalculation_Click(object sender, EventArgs e)
         {
-            if (lstCalculations.Items.Count == 0)
+            if (calculationManager.Count == 0)
             {
                 ShowToolTipMessageNearNextCalculationTextbox(
                     "There are no calculations to delete.");
@@ -730,7 +752,7 @@ namespace AddStrip
         private void btnInsertCalculation_Click(object sender, EventArgs e)
         {
             
-            if (lstCalculations.Items.Count == 0)
+            if (calculationManager.Count == 0)
             {
                 ShowToolTipMessageNearNextCalculationTextbox(
                     "There are no calculations to insert above.\r\n");
@@ -743,13 +765,12 @@ namespace AddStrip
             else if (!SelectedCalculationIsValid(txtSelectedCalculation.Text))
             {
                 ShowToolTipMessageNearNextCalculationTextbox(
-                    "The calculation you entered was not valid.\r\n" +
-                    "A valid calculation has the form \"<operator>  <digits>\"");
+                    MessageEditingInvalidCalculationEnteredError);
             }
 
             // first calcline in any set of calculations must start with - or +
             else if ((lstCalculations.SelectedIndex == 0
-                || lstCalculations.Items.Count > 1 &&
+                || calculationManager.Count > 1 &&
                 lstCalculations.SelectedIndex > 0 &&
                 calculationManager.Find(lstCalculations.SelectedIndex - 1).Op
                 == Operator.total)
@@ -757,11 +778,11 @@ namespace AddStrip
                 ))
             {
                 ShowToolTipMessageNearNextCalculationTextbox(
-                    "The first calc line in any calculation must have a + or - operator.");
+                    MessageInitialCalcLineMissingSignError);
             }
 
             // cannot put a subtotal after another subtotal or before another subtotal
-            else if (lstCalculations.Items.Count > 1
+            else if (calculationManager.Count > 1
                 && OperatorSubTotal.Contains(txtSelectedCalculation.Text[0])
                 && ((lstCalculations.SelectedIndex - 1 > -1
                         && calculationManager.Find(lstCalculations.SelectedIndex - 1).Op
@@ -771,12 +792,11 @@ namespace AddStrip
                 )
             {
                 ShowToolTipMessageNearNextCalculationTextbox(
-                    "You cannot place multiple subtotals in a row.\r\n" +
-                    "Check your calculations and where you are placing the subtotal.");
+                    MessageEditingPlaceConsecutiveSubtotalsError);
             }
 
             // cannot insert a total before another total or after another total.
-            else if (lstCalculations.Items.Count > 1
+            else if (calculationManager.Count > 1
                 && OperatorFullTotal.Contains(txtSelectedCalculation.Text[0])
                 && ((lstCalculations.SelectedIndex - 1 > -1
                         && calculationManager.Find(lstCalculations.SelectedIndex - 1).Op
@@ -786,8 +806,7 @@ namespace AddStrip
                 )
             {
                 ShowToolTipMessageNearNextCalculationTextbox(
-                    "You cannot place a total before or after an existing total.\r\n" +
-                    "Check your calculations and where you are placing this total.");
+                    MessageEditingConsecutiveTotalsError);
             }
 
 
